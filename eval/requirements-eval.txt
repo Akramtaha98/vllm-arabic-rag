@@ -1,0 +1,6 @@
+transformers>=4.44.0
+rouge-score==0.1.2
+sacrebleu==2.4.3
+bert-score==0.3.13
+pandas==2.2.2
+matplotlib==3.9.2

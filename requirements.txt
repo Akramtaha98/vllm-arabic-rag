@@ -1,0 +1,11 @@
+streamlit==1.38.0
+requests==2.32.3
+sentence-transformers==3.1.1
+torch>=2.1.0
+numpy<2.0
+python-dotenv==1.0.1
+
+# Optional: only needed if you wire up a real Chroma vector DB via
+# middleware/retriever.py:build_chroma_collection(). Not required to run
+# the demo (it falls back to an in-memory mock corpus). Install separately:
+#   pip install chromadb==0.5.5
