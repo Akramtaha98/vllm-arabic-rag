@@ -1,6 +1,6 @@
 # Applied Intelligence Submission Compliance Checklist
 
-**Manuscript:** Semantic-Driven Context Pruning for Optimizing Arabic RAG Systems in Memory-Constrained vLLM Deployments
+**Manuscript:** Semantic-Driven Context Pruning for Arabic RAG Systems: Toward Memory-Efficient vLLM-Based Deployment
 **Author:** Akram Taha
 **Package location:** `vllm-arabic-rag/paper/latex_submission/` (flat, no subfolders)
 **Prepared against:** the Springer/Applied Intelligence "Submission guidelines" and "Aims and scope" pages you pasted in this session.
