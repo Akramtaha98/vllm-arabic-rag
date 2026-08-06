@@ -1,0 +1,10 @@
+ratio,metric,n_pairs,mean_diff_lspm_minus_naive,bootstrap_p_value
+0.3,rougeL,8,0.0487,0.5158
+0.3,bleu,8,6.218,0.577
+0.3,bertscore_f1,8,0.0045,0.8179
+0.5,rougeL,8,0.0215,0.5128
+0.5,bleu,8,0.5302,0.7267
+0.5,bertscore_f1,8,0.0033,0.8378
+0.7,rougeL,8,-0.0268,0.5292
+0.7,bleu,8,-7.5781,0.2207
+0.7,bertscore_f1,8,-0.0059,0.5375

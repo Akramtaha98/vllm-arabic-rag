@@ -25,12 +25,28 @@ baseline), which is the core "did pruning break anything" metric.
 import argparse
 import csv
 import json
+import re
 import statistics
 from pathlib import Path
 
 from rouge_score import rouge_scorer
 from sacrebleu.metrics import BLEU
 from bert_score import score as bertscore
+
+
+class MultilingualTokenizer:
+    """
+    rouge_score's built-in tokenizer only matches ASCII [a-z0-9], which
+    silently produces empty token lists (and spurious 0.0 scores) for
+    non-Latin scripts such as Arabic. This tokenizer keeps any Unicode
+    word character (covers Arabic, Latin, digits, etc.) so ROUGE-L is
+    computed correctly for Arabic text.
+    """
+
+    _WORD_RE = re.compile(r"\w+", re.UNICODE)
+
+    def tokenize(self, text: str):
+        return self._WORD_RE.findall(text.lower())
 
 
 def load_records(path: str):
@@ -55,8 +71,10 @@ def main():
         print("No records found.")
         return
 
-    rouge = rouge_scorer.RougeScorer(["rougeL"], use_stemmer=False)
-    bleu = BLEU()
+    rouge = rouge_scorer.RougeScorer(
+        ["rougeL"], use_stemmer=False, tokenizer=MultilingualTokenizer()
+    )
+    bleu = BLEU(effective_order=True)
 
     rows = []
     for r in records:

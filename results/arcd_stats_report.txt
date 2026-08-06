@@ -1,0 +1,54 @@
+ARCD ground-truth accuracy experiment: statistical summary
+n = 140 questions, 6-document noisy retrieval pool (1 gold + 5 distractors),
+scored with Arabic-normalized Exact Match (EM) and token-F1 against ARCD's real gold answers.
+Bootstrap CIs: 10,000 percentile resamples, seed=42.
+
+-- Per-cell means --
+raw    r=1.0  EM=0.293 [0.221, 0.371]   F1=0.664 [0.610, 0.717]
+lspm   r=0.3  EM=0.314 [0.236, 0.393]   F1=0.650 [0.594, 0.705]
+naive  r=0.3  EM=0.250 [0.179, 0.321]   F1=0.536 [0.472, 0.599]
+lspm   r=0.5  EM=0.300 [0.229, 0.379]   F1=0.638 [0.580, 0.693]
+naive  r=0.5  EM=0.293 [0.221, 0.371]   F1=0.576 [0.512, 0.639]
+lspm   r=0.7  EM=0.300 [0.229, 0.379]   F1=0.661 [0.606, 0.717]
+naive  r=0.7  EM=0.286 [0.214, 0.364]   F1=0.604 [0.544, 0.663]
+
+-- Core novelty claim: LSPM vs. naive truncation (same ratio) --
+lspm_r0.3 vs naive_r0.3 [em]  mean_diff=+0.064 [+0.007, +0.121]  sign p=0.049  wilcoxon p=0.029  (significant at alpha=0.05, uncorrected)
+lspm_r0.3 vs naive_r0.3 [f1]  mean_diff=+0.114 [+0.056, +0.174]  sign p=0.063  wilcoxon p=0.001  holm-adj p=0.005  (significant at alpha=0.05, uncorrected)
+lspm_r0.5 vs naive_r0.5 [em]  mean_diff=+0.007 [-0.050, +0.064]  sign p=1.000  wilcoxon p=0.808  (not significant at alpha=0.05, uncorrected)
+lspm_r0.5 vs naive_r0.5 [f1]  mean_diff=+0.062 [+0.003, +0.121]  sign p=0.098  wilcoxon p=0.035  holm-adj p=0.148  (significant at alpha=0.05, uncorrected)
+lspm_r0.7 vs naive_r0.7 [em]  mean_diff=+0.014 [-0.036, +0.064]  sign p=0.791  wilcoxon p=0.593  (not significant at alpha=0.05, uncorrected)
+lspm_r0.7 vs naive_r0.7 [f1]  mean_diff=+0.058 [+0.009, +0.108]  sign p=0.302  wilcoxon p=0.030  holm-adj p=0.148  (significant at alpha=0.05, uncorrected)
+
+-- Fidelity loss vs. raw (unpruned) answer --
+lspm_r0.3 vs raw       [em]  mean_diff=+0.021 [-0.029, +0.071]  wilcoxon p=0.405
+naive_r0.3 vs raw      [em]  mean_diff=-0.043 [-0.100, +0.014]  wilcoxon p=0.134
+lspm_r0.3 vs raw       [f1]  mean_diff=-0.015 [-0.053, +0.024]  wilcoxon p=0.211  holm-adj p=0.434
+naive_r0.3 vs raw      [f1]  mean_diff=-0.128 [-0.184, -0.074]  wilcoxon p=0.000  holm-adj p=0.000
+lspm_r0.5 vs raw       [em]  mean_diff=+0.007 [-0.036, +0.050]  wilcoxon p=0.763
+naive_r0.5 vs raw      [em]  mean_diff=+0.000 [-0.057, +0.057]  wilcoxon p=1.000
+lspm_r0.5 vs raw       [f1]  mean_diff=-0.027 [-0.061, +0.006]  wilcoxon p=0.145  holm-adj p=0.434
+naive_r0.5 vs raw      [f1]  mean_diff=-0.088 [-0.141, -0.037]  wilcoxon p=0.002  holm-adj p=0.015
+lspm_r0.7 vs raw       [em]  mean_diff=+0.007 [-0.043, +0.057]  wilcoxon p=0.763
+naive_r0.7 vs raw      [em]  mean_diff=-0.007 [-0.064, +0.050]  wilcoxon p=0.796
+lspm_r0.7 vs raw       [f1]  mean_diff=-0.003 [-0.037, +0.030]  wilcoxon p=0.937  holm-adj p=0.937
+naive_r0.7 vs raw      [f1]  mean_diff=-0.061 [-0.112, -0.012]  wilcoxon p=0.020  holm-adj p=0.121
+
+-- Holm-Bonferroni correction across the 9-test F1 family (n=140) --
+lspm_r0.3 vs naive_r0.3    raw p=0.0007  holm-adjusted p=0.0054  (SIGNIFICANT)
+lspm_r0.5 vs naive_r0.5    raw p=0.0347  holm-adjusted p=0.1482  (n.s.)
+lspm_r0.7 vs naive_r0.7    raw p=0.0296  holm-adjusted p=0.1482  (n.s.)
+naive_r0.3 vs raw          raw p=0.0000  holm-adjusted p=0.0004  (SIGNIFICANT)
+naive_r0.5 vs raw          raw p=0.0021  holm-adjusted p=0.0148  (SIGNIFICANT)
+naive_r0.7 vs raw          raw p=0.0201  holm-adjusted p=0.1207  (n.s.)
+lspm_r0.3 vs raw           raw p=0.2108  holm-adjusted p=0.4342  (n.s.)
+lspm_r0.5 vs raw           raw p=0.1447  holm-adjusted p=0.4342  (n.s.)
+lspm_r0.7 vs raw           raw p=0.9374  holm-adjusted p=0.9374  (n.s.)
+
+-- TOST equivalence test (margin=+/-0.05 F1, n=140) --
+lspm_r0.3 vs raw       mean_diff=-0.0146  TOST p=0.0378  (EQUIVALENT)
+naive_r0.3 vs raw      mean_diff=-0.1283  TOST p=0.9965  (inconclusive)
+lspm_r0.5 vs raw       mean_diff=-0.0267  TOST p=0.0870  (inconclusive)
+naive_r0.5 vs raw      mean_diff=-0.0883  TOST p=0.9223  (inconclusive)
+lspm_r0.7 vs raw       mean_diff=-0.0029  TOST p=0.0030  (EQUIVALENT)
+naive_r0.7 vs raw      mean_diff=-0.0605  TOST p=0.6583  (inconclusive)

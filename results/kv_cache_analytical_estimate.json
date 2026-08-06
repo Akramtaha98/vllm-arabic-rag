@@ -1,0 +1,47 @@
+{
+  "kv_bytes_per_token": 131072.0,
+  "kv_kib_per_token": 128.0,
+  "mean_raw_context_chars": 602,
+  "arabic_chars_per_token": 2.656,
+  "estimated_raw_context_tokens": 226.6,
+  "per_ratio": [
+    {
+      "ratio": 0.3,
+      "measured_char_reduction": 0.6729,
+      "estimated_tokens_saved_per_request": 152.5,
+      "estimated_kv_cache_saved_per_request_kib": 19520.1,
+      "estimated_kv_cache_saved_per_request_mib": 19.06
+    },
+    {
+      "ratio": 0.5,
+      "measured_char_reduction": 0.5029,
+      "estimated_tokens_saved_per_request": 114.0,
+      "estimated_kv_cache_saved_per_request_kib": 14588.6,
+      "estimated_kv_cache_saved_per_request_mib": 14.25
+    },
+    {
+      "ratio": 0.7,
+      "measured_char_reduction": 0.3422,
+      "estimated_tokens_saved_per_request": 77.6,
+      "estimated_kv_cache_saved_per_request_kib": 9926.9,
+      "estimated_kv_cache_saved_per_request_mib": 9.69
+    }
+  ],
+  "concurrency_projection_at_r0.5": [
+    {
+      "concurrency": 10,
+      "aggregate_kv_cache_saved_mib": 142.5,
+      "aggregate_kv_cache_saved_gib": 0.14
+    },
+    {
+      "concurrency": 50,
+      "aggregate_kv_cache_saved_mib": 712.3,
+      "aggregate_kv_cache_saved_gib": 0.7
+    },
+    {
+      "concurrency": 100,
+      "aggregate_kv_cache_saved_mib": 1424.7,
+      "aggregate_kv_cache_saved_gib": 1.39
+    }
+  ]
+}

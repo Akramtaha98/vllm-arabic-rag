@@ -1,0 +1,38 @@
+%% ============================================================
+%% Semantic-Driven Context Pruning for Optimizing Arabic RAG
+%% Systems in Memory-Constrained vLLM Deployments
+%% Author: Akram Taha
+%% Target venue: Applied Intelligence (Springer)
+%% Class: sn-jnl.cls (Springer Nature unified LaTeX template,
+%%        official CDN download, "December 2024" version)
+%% Citation style: IEEE numbered brackets, first-citation order
+%%        (\documentclass option: sn-basic + Numbered)
+%% ============================================================
+\documentclass[pdflatex,sn-basic,Numbered]{sn-jnl}
+
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+
+\begin{document}
+
+\title[Semantic-Driven Context Pruning for Arabic RAG on vLLM]{Semantic-Driven Context Pruning for Optimizing Arabic RAG Systems in Memory-Constrained vLLM Deployments}
+
+\author*[1,2]{\fnm{Akram} \sur{Taha}}\email{akramtaha30@gmail.com}
+
+\affil*[1]{\orgdiv{College of Computer Engineering}, \orgname{University of Technology - Iraq}, \orgaddress{\city{Baghdad}, \country{Iraq}}}
+
+\affil[2]{\orgdiv{Center for Artificial Intelligence Technology (CAIT), Faculty of Information Science and Technology (FTSM)}, \orgname{Universiti Kebangsaan Malaysia (UKM)}, \orgaddress{\city{Bangi}, \state{Selangor}, \country{Malaysia}}}
+
+\abstract{Retrieval-Augmented Generation (RAG) systems deployed for Arabic applications face a memory bottleneck: Arabic's morphological richness fragments subword-tokenized text into more tokens than equivalent English text, inflating the Key-Value (KV) cache vLLM-class engines must maintain per request. We introduce a Lightweight Semantic Pruning Middleware (LSPM), a thin layer between retrieval and generation that scores passages at the sentence level with a cross-encoder and forwards only the highest-relevance subset under a fixed or load-aware ratio. We report four preliminary findings. First, across 30 hand-verified Arabic-English sentence pairs, two tokenizers confirm an aggregate Arabic-to-English token ratio of 1.76x and 1.69x (bootstrap $p<0.0001$ versus parity). Second, a fidelity pilot sweeping three compression ratios ($r=0.3, 0.5, 0.7$) shows pruned answers remain consistent with unpruned ones (mean ROUGE-L 0.89--0.93, BERTScore-F1 0.96--0.97). Third, re-testing the naive-truncation baseline on 140 real ARCD questions (980 live generations) for adequate power, LSPM significantly beats naive truncation head-to-head on token-F1 at the most aggressive ratio ($r=0.3$: +0.114 F1, Holm-adjusted $p=0.005$) and is equivalent to the unpruned answer at $r=0.3$ and $r=0.7$ (TOST, $p=0.038$, $p=0.003$), while naive truncation is significantly worse than unpruned at $r=0.3$/$0.5$ (adjusted $p=0.0004$, $0.015$); at $r=0.5$/$0.7$ the head-to-head advantage is positive but non-significant. Fourth, absent GPU access, we give an analytical KV-cache-savings projection from Llama-3.1-8B-Instruct's architecture and the measured context reduction (9.7--19.1 MiB/request), not a throughput claim. We release the implementation, raw data, and a live demo.}
+
+\keywords{retrieval-augmented generation, Arabic natural language processing, prompt compression, vLLM, large language models}
+
+\maketitle
+
+\noindent\textbf{ORCID (A. Taha):} \href{https://orcid.org/0009-0002-4020-8060}{https://orcid.org/0009-0002-4020-8060}
+
+\input{body_generated.tex}
+
+\end{document}

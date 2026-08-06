@@ -1,0 +1,30 @@
+End-to-end retrieval evaluation: statistical summary
+n = 60 questions, top-6 documents from a real TF-IDF retriever over a
+234-paragraph corpus (recall@6 is NOT guaranteed). Scored with Arabic-normalized EM/F1.
+Retrieval recall@6: 52/60 = 86.7% (gold paragraph retrieved); 8/60 = 13.3% miss.
+Bootstrap CIs: 10,000 percentile resamples, seed=42.
+
+-- Per-cell means (subset = all / retrieval_hit / retrieval_miss) --
+raw    [all             n=60]  EM=0.167 [0.083, 0.267]   F1=0.561 [0.468, 0.652]
+raw    [retrieval_hit   n=52]  EM=0.192 [0.096, 0.308]   F1=0.639 [0.547, 0.726]
+raw    [retrieval_miss  n= 8]  EM=0.000 [0.000, 0.000]   F1=0.056 [0.000, 0.139]
+lspm   [all             n=60]  EM=0.233 [0.133, 0.350]   F1=0.582 [0.491, 0.672]
+lspm   [retrieval_hit   n=52]  EM=0.250 [0.135, 0.365]   F1=0.643 [0.555, 0.729]
+lspm   [retrieval_miss  n= 8]  EM=0.125 [0.000, 0.375]   F1=0.179 [0.013, 0.429]
+naive  [all             n=60]  EM=0.133 [0.050, 0.233]   F1=0.525 [0.435, 0.612]
+naive  [retrieval_hit   n=52]  EM=0.154 [0.058, 0.250]   F1=0.584 [0.492, 0.671]
+naive  [retrieval_miss  n= 8]  EM=0.000 [0.000, 0.000]   F1=0.142 [0.017, 0.308]
+
+-- Paired comparisons --
+[all            n=60] lspm vs naive  [em]  mean_diff=+0.100 [+0.033, +0.183]  sign p=0.031  wilcoxon p=0.014
+[all            n=60] lspm vs raw    [em]  mean_diff=+0.067 [+0.017, +0.133]  sign p=0.125  wilcoxon p=0.046
+[all            n=60] naive vs raw   [em]  mean_diff=-0.033 [-0.083, +0.000]  sign p=0.500  wilcoxon p=0.157
+[all            n=60] lspm vs naive  [f1]  mean_diff=+0.056 [-0.017, +0.134]  sign p=0.027  wilcoxon p=0.085
+[all            n=60] lspm vs raw    [f1]  mean_diff=+0.021 [-0.042, +0.084]  sign p=0.839  wilcoxon p=0.440
+[all            n=60] naive vs raw   [f1]  mean_diff=-0.036 [-0.107, +0.030]  sign p=0.405  wilcoxon p=0.354
+[retrieval_hit  n=52] lspm vs naive  [em]  mean_diff=+0.096 [+0.019, +0.192]  sign p=0.062  wilcoxon p=0.025
+[retrieval_hit  n=52] lspm vs raw    [em]  mean_diff=+0.058 [+0.000, +0.135]  sign p=0.250  wilcoxon p=0.083
+[retrieval_hit  n=52] naive vs raw   [em]  mean_diff=-0.038 [-0.096, +0.000]  sign p=0.500  wilcoxon p=0.157
+[retrieval_hit  n=52] lspm vs naive  [f1]  mean_diff=+0.059 [-0.023, +0.146]  sign p=0.019  wilcoxon p=0.099
+[retrieval_hit  n=52] lspm vs raw    [f1]  mean_diff=+0.005 [-0.060, +0.064]  sign p=0.832  wilcoxon p=0.638
+[retrieval_hit  n=52] naive vs raw   [f1]  mean_diff=-0.055 [-0.132, +0.016]  sign p=0.189  wilcoxon p=0.217

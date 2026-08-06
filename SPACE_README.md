@@ -8,7 +8,7 @@ sdk_version: "1.38.0"
 app_file: app.py
 pinned: false
 license: mit
-short_description: Semantic context pruning for faster, lighter Arabic RAG on vLLM
+short_description: Semantic pruning for faster Arabic RAG on vLLM
 ---
 
 # ⚡ Arabic RAG Optimizer
