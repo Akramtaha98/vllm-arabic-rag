@@ -19,7 +19,10 @@ import time
 
 import requests
 
-METRIC_PATTERN = re.compile(r"^vllm:gpu_cache_usage_perc(\{[^}]*\})?\s+([0-9.eE+-]+)\s*$", re.MULTILINE)
+METRIC_PATTERN = re.compile(
+    r"^vllm:(?:gpu_cache_usage_perc|kv_cache_usage_perc)(\{[^}]*\})?\s+([0-9.eE+-]+)\s*$",
+    re.MULTILINE,
+)
 
 
 def scrape_once(url: str):
