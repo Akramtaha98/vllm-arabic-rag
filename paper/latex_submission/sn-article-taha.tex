@@ -25,9 +25,7 @@
 
 \affil[2]{\orgdiv{Center for Artificial Intelligence Technology (CAIT), Faculty of Information Science and Technology (FTSM)}, \orgname{Universiti Kebangsaan Malaysia (UKM)}, \orgaddress{\city{Bangi}, \state{Selangor}, \country{Malaysia}}}
 
-\abstract{Retrieval-Augmented Generation (RAG) systems for Arabic applications face a memory bottleneck: Arabic's rich morphology yields more tokens than equivalent English text, inflating the KV cache that engines like vLLM must maintain per request. We introduce a Lightweight Semantic Pruning Middleware (LSPM) that scores retrieved passages at the sentence level with a cross-encoder, keeping only the most relevant subset at a fixed or dynamic ratio. We report four preliminary findings. First, across 30 verified Arabic/English sentence pairs, two tokenizers confirm an aggregate token ratio of 1.76x/1.69x (bootstrap $p<0.0001$ vs. parity). Second, a fidelity pilot across three compression ratios (0.3--0.7) shows pruned answers match unpruned ones (ROUGE-L 0.89--0.93, BERTScore-F1 0.96--0.97). Third, re-testing naive truncation on 140 real ARCD questions (980 generations), LSPM beats naive truncation directly on F1 at the most aggressive ratio (+0.114, adjusted $p=0.005$) and is equivalent to the unpruned answer (equivalence test $p=0.038$, $0.003$); naive truncation is significantly worse than unpruned at two ratios (adjusted $p=0.0004$, $0.015$), and the LSPM advantage is not significant at moderate ratios. Fourth, absent GPU access, we give an analytical projection of KV-cache savings from the target model's published architecture (9.7--19.1 MiB per request), not a throughput claim; vLLM is the intended, not yet measured, deployment target. We release the implementation, raw data, and a live demo.}
-
-\keywords{retrieval-augmented generation, Arabic natural language processing, prompt compression, vLLM, large language models}
+\input{abstract_generated.tex}
 
 \maketitle
 

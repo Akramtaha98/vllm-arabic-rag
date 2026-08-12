@@ -2,16 +2,29 @@
 """
 Converts paper_draft_v2.md (Sections 1-9 + Statements and Declarations +
 References; Appendix excluded per round-2 review recommendation) into a
-Springer Nature sn-jnl LaTeX body, written to body_generated.tex.
-This file is \input{} by the main sn-article-taha.tex file, which supplies
-the documentclass, author/affiliation/ORCID block, abstract, and keywords
-directly (those are hand-written, not generated, since they are short and
-fixed).
+Springer Nature sn-jnl LaTeX body, written to body_generated.tex, AND
+generates abstract_generated.tex (abstract + keywords) from the same
+source markdown. This file is \input{} by the main sn-article-taha.tex
+file, which supplies the documentclass and author/affiliation/ORCID block
+directly (those genuinely don't change round to round), and \input{}s
+abstract_generated.tex for the abstract/keywords.
+
+IMPORTANT, learned the hard way in round 7 (external review caught it):
+the abstract used to be hand-copied into sn-article-taha.tex separately
+from paper_draft_v2.md's abstract, and drifted out of sync across several
+revision rounds without anyone noticing until a reviewer read the actual
+PDF -- the abstract still said "absent GPU access... not yet measured"
+while Section 5.8 reported a real GPU benchmark. Generating it from the
+same source as the body makes that specific class of bug structurally
+impossible going forward. Do not hand-edit the abstract/keywords in
+sn-article-taha.tex again; edit paper_draft_v2.md's ## Abstract section
+and re-run this script.
 """
 import re
 
 SRC = "paper_draft_v2.md"
 OUT = "body_generated.tex"
+ABSTRACT_OUT = "abstract_generated.tex"
 
 text = open(SRC, encoding="utf-8").read()
 
@@ -105,10 +118,29 @@ def restore_code(s):
     return re.sub(r"@@CODESPAN(\d+)@@", repl, s)
 
 
+LINK_SPANS = []
+
+
+def stash_link(m):
+    text, url = m.group(1), m.group(2)
+    text_escaped = escape_latex_text(text)
+    LINK_SPANS.append(r"\href{" + url + "}{" + text_escaped + "}")
+    return f"@@LINKSPAN{len(LINK_SPANS)-1}@@"
+
+
+def restore_links(s):
+    def repl(m):
+        idx = int(m.group(1))
+        return LINK_SPANS[idx]
+    return re.sub(r"@@LINKSPAN(\d+)@@", repl, s)
+
+
 def convert_inline(s):
     """Convert one line/paragraph of markdown inline syntax to LaTeX."""
     s = re.sub(r"`([^`]+)`", stash_code, s)
+    s = re.sub(r"\[([^\[\]]+)\]\((https?://[^\s()]+)\)", stash_link, s)
     s = escape_latex_text(s)
+    s = restore_links(s)
     s = re.sub(r"\*\*(.+?)\*\*", r"\\textbf{\1}", s)
     s = re.sub(r"\*(.+?)\*", r"\\textit{\1}", s)
     s = restore_code(s)
@@ -184,6 +216,9 @@ def build():
             # (full explanatory text already appears in the surrounding prose).
             HEADER_SHORTEN = {
                 "Sign test (above/below 1.0)": "Sign test",
+                "TTFT p50 / p95 (ms)": "TTFT p50/p95 (ms)",
+                "Mean / Peak KV-cache (%)": "Mean/Peak KV (%)",
+                "Completion tok/s": "Tok/s",
             }
             header_cells = [HEADER_SHORTEN.get(c, c) for c in header_cells]
             data_rows = []
@@ -202,8 +237,17 @@ def build():
                 out.append(f"\\caption{{{caption_latex}}}")
             out.append(f"\\label{{tab:{table_num}}}")
             out.append(r"\centering")
-            out.append(r"\footnotesize")
-            out.append(r"\setlength{\tabcolsep}{3.5pt}")
+            # Known-wide tables (6 numeric columns with long headers, e.g.
+            # the GPU benchmark table -- 63.7pt overflow caught on external
+            # review) drop to \scriptsize and tighter column padding instead
+            # of \footnotesize. (Tried wrapping in \resizebox first, but
+            # sn-jnl.cls's internal table wrapper -- threeparttable/tableorg
+            # -- doesn't tolerate \resizebox directly around \tabular there:
+            # it throws "Division by 0" and visibly corrupts the page. Font
+            # size + tabcolsep is the safe fix for this class.)
+            needs_shrink = caption_latex is not None and "least time-confounded" in caption_latex
+            out.append(r"\scriptsize" if needs_shrink else r"\footnotesize")
+            out.append(r"\setlength{\tabcolsep}{2pt}" if needs_shrink else r"\setlength{\tabcolsep}{3.5pt}")
             out.append(f"\\begin{{tabular}}{{{colspec}}}")
             out.append(r"\toprule")
             out.append(" & ".join(convert_inline(c) for c in header_cells) + r" \\")
@@ -264,6 +308,37 @@ def build():
 body_tex = build()
 
 # ---------------------------------------------------------------
+# 2b. Generate abstract_generated.tex from the same markdown source
+#     (see module docstring -- this replaced a hand-copied abstract that
+#     silently drifted out of sync with the body across revision rounds).
+# ---------------------------------------------------------------
+abstract_marker = "## Abstract"
+keywords_marker = "**Keywords:**"
+abstract_start = text.find(abstract_marker)
+keywords_start = text.find(keywords_marker)
+intro_marker = "## 1. Introduction"
+intro_start_for_kw = text.find(intro_marker)
+
+assert abstract_start != -1 and keywords_start != -1, "abstract/keywords markers not found"
+
+abstract_raw = text[abstract_start + len(abstract_marker):keywords_start].strip()
+# Keywords are a single markdown line right after the "**Keywords:**"
+# marker; take only that line, not everything up to Section 1 (which
+# would otherwise swallow the "---" separator and blank lines in between).
+keywords_line = text[keywords_start + len(keywords_marker):intro_start_for_kw].strip().split("\n")[0]
+keywords_list = [k.strip().rstrip(".") for k in keywords_line.split(";") if k.strip()]
+
+for old, new in UNICODE_REPLACEMENTS:
+    abstract_raw = abstract_raw.replace(old, new)
+
+abstract_tex = convert_inline(abstract_raw)
+keywords_tex = ", ".join(convert_inline(k) for k in keywords_list)
+
+abstract_block = f"\\abstract{{{abstract_tex}}}\n\n\\keywords{{{keywords_tex}}}\n"
+open(ABSTRACT_OUT, "w", encoding="utf-8").write(abstract_block)
+print(f"Wrote {ABSTRACT_OUT}, {len(keywords_list)} keywords.")
+
+# ---------------------------------------------------------------
 # 3. Build References as hand-crafted thebibliography (order already
 #    verified correct by renumber_refs.py -- 1..42 first-citation order).
 # ---------------------------------------------------------------
@@ -272,7 +347,7 @@ ref_entries = {}
 for m in entry_pattern.finditer(refs_block):
     ref_entries[int(m.group(1))] = m.group(2).strip()
 
-assert set(ref_entries.keys()) == set(range(1, 43)), "reference parse failed"
+assert set(ref_entries.keys()) == set(range(1, 44)), "reference parse failed"
 
 def linkify_doi(entry_tex):
     # Turn "doi: 10.xxxx/yyyy" into a clickable hyperref link (sn-jnl.cls
@@ -286,8 +361,8 @@ def linkify_doi(entry_tex):
     return entry_tex
 
 
-bib_lines = [r"\begin{thebibliography}{42}"]
-for num in range(1, 43):
+bib_lines = [r"\begin{thebibliography}{43}"]
+for num in range(1, 44):
     entry = ref_entries[num]
     entry_tex = convert_inline(entry)
     entry_tex = re.sub(r"(https://\S+?)(\.?)( |$)", r"\\url{\1}\2\3", entry_tex)

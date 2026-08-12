@@ -11,31 +11,45 @@ evaluators: yes, 1-2 people).
 sentence. Recompiled — 32 pages, no errors, `[43]` renders correctly as
 the last entry in the bibliography.
 
-## Ready for you to run (harness built and tested; needs your GPU)
+## #1 status: v1 done and honestly scoped in the manuscript; v2 (corrected re-run) is the top open item
 
-**#1 — Real vLLM GPU benchmark.** This is the highest-impact item, and
-you have a GPU, so it's the one to prioritize. I extended the existing
-benchmark harness (`benchmark/`) to add what it was missing:
-- A third condition, **naive truncation**, alongside raw and LSPM (same
-  truncation function as the accuracy experiments, so both experiments
-  share one baseline definition).
-- Ratios changed from a generic {0.2, 0.5, 0.8} sweep to the paper's
-  actual headline ratios **{0.3, 0.5, 0.7}**.
-- Real **TTFT** measurement via streaming responses (previously only
-  total latency and a throughput estimate were captured).
-- The sweep runner now auto-skips completed cells, so it's safe to
-  interrupt and resume.
+**v1 — first GPU sweep.** Ran the full 35-cell sweep (raw + LSPM + naive
+truncation × r={0.3,0.5,0.7} × concurrency={1,10,25,50,100}) on a rented
+RTX 3090. Two real issues surfaced, both caught before submission rather
+than after:
 
-I stress-tested `analyze_sweep_results.py` against fabricated locust/
-metrics CSVs to confirm the parsing and plotting logic is correct before
-handing it to you — what's unverified is only the real GPU run, which
-needs your hardware. Full instructions: `benchmark/BENCHMARK_INSTRUCTIONS.md`.
-Runtime estimate: ~55-60 minutes at the default 90s/cell.
+- The `e2e_p50/p95/p99` columns in `sweep_summary.csv` are a measurement
+  artifact (Locust's timer stops at response headers, not full stream
+  completion) — dropped from the paper entirely.
+- Between-method KV-cache/throughput comparisons are only clean at the
+  single c=1 cell; already mixed at c=10 (LSPM's peak KV-cache exceeds
+  raw's at every ratio there) and reverse outright by c≥25. This was
+  caught on review (my initial draft of Section 5.8 overclaimed a
+  "c=1, c=10" confirmation that Table 8's own numbers didn't support —
+  corrected to a single-cell, exploratory claim only).
 
-**When you have results:** send me `results/sweep_summary.csv` and
-`results/sweep_comparison.png` and I'll replace the analytical KV-cache
-projection with the measured numbers, add a new results subsection, and
-rebuild the PDF.
+**v2 — corrected re-run (not yet executed).** Built and validated
+(synthetic-data-tested, same standard as v1) three harness fixes:
+`benchmark/precompute_contexts.py` moves LSPM's cross-encoder scoring out
+of the Locust load-generator process entirely; `run_full_sweep.py` now
+shuffles cell execution order (seeded) instead of running fixed method
+blocks in sequence; `--repeats 3` (new) runs each cell independently 3x
+so `analyze_sweep_results.py` can report mean ± 95% CI instead of a
+point estimate. Full instructions in `benchmark/BENCHMARK_INSTRUCTIONS.md`.
+**Estimated cost: ~3 hours of GPU rental** (vs. v1's ~1 hour) at the
+default settings — this is the next thing to run when you're ready.
+
+Section 4.5/4.6 and 5.8 in `paper_draft_v2.md` (mirrored into LaTeX) now
+describe the actual executed v1 experiment and its scope honestly, with
+the v2 fix specified as required next steps rather than optional polish.
+Full 35-cell v1 table added as Appendix G. PDF rebuilt: 36 pages, compiles
+clean, Figure 6 regenerated larger (3 stacked panels) and readable.
+
+**Also still needed, separate from the re-run itself:** a new Zenodo
+version (not a new record — same concept DOI, versioned) archiving the
+v2 data/scripts/updated PDF, since the currently-cited DOI (Aug 6) predates
+all of this. See the message accompanying this plan for exact steps once
+you're ready to push.
 
 ## Ready for your evaluators (kit built and tested; needs 1-2 people)
 
@@ -76,10 +90,68 @@ Given your reviewer list ranks #1 and #2 as the two that matter most for
 minor-revision odds, and #2 is the one still blocked on budget, that's
 the most likely next thing to greenlight if you decide to spend more.
 
-## Bottom line
+## Round 3 external review (this round): three more real bugs, all fixed
 
-Once you run the GPU sweep (#1) and get evaluator ratings back (#5), send
-both results sets and I'll integrate them, rebuild the LaTeX/PDF, and
-that's the two highest-leverage items from your list closed with real
-measurements instead of projections — which was the single biggest
-reviewer-facing risk in the current draft.
+1. **Abstract/body desync, root-caused.** `sn-article-taha.tex` hand-copied
+   the abstract separately from `paper_draft_v2.md`, and that copy hadn't
+   been touched since round 6 — it still said "absent GPU access... not
+   yet measured" on page 1 while Section 5.8 reported a real benchmark.
+   Fixed the immediate text, and fixed the root cause: `build_latex.py`
+   now generates `abstract_generated.tex` from the same markdown source as
+   the body, and `sn-article-taha.tex` `\input{}`s it instead of hardcoding
+   it. This class of bug is now structurally prevented, not just patched.
+2. **"No throughput cost" was numerically wrong.** Table 8: LSPM's request
+   throughput at c=1 is 8.5-11.9% *lower* than raw's, not unchanged — I'd
+   conflated it with completion tokens/sec (which *is* within 0.5%).
+   Corrected everywhere: abstract, scope note, Section 5.8, Discussion,
+   Limitations, Future Work, Appendix F, `BENCHMARK_INSTRUCTIONS.md`.
+3. **Data availability was unsupported.** The Zenodo DOI cited in the
+   paper (archived ~Aug 7) predates the GPU sweep (Aug 11) entirely, and
+   this session's manuscript/harness changes were sitting locally
+   uncommitted — see below.
+
+Also fixed: Table 8's 63.7pt LaTeX overflow (dropped the redundant
+Concurrency column since every row is c=1, `\scriptsize`), "Key-Value
+(KV)" defined at first use in the abstract, and DOI links added for 11
+references that were missing them (verified via web search against
+arXiv/ACL Anthology — 2 references, Orca/OSDI and the 2004 ROUGE paper,
+genuinely have no DOI in any registry and were left as-is rather than
+fabricating one).
+
+## Bottom line — still do not submit yet
+
+**Blocking, needs you (I cannot do this from here):** `.git/index.lock`
+in your local repo is still permission-blocked from my side — 21 files
+of this session's work (all the fixes above, plus the harness changes)
+are sitting locally, uncommitted, unpushed. Run on your Mac:
+
+```bash
+cd /Users/akramtaha/Work/Papers/VLLM/vllm-arabic-rag
+rm -f .git/index.lock
+git add -A
+git add -f results/sweep/          # currently gitignored -- this is the
+                                     # "no raw GPU files in the repo" gap
+git commit -m "Round 7: fold measured GPU benchmark into manuscript, fix abstract/throughput/DOI issues, add v2 harness"
+git push origin main
+```
+
+Then, since the currently-cited Zenodo DOI predates all of this:
+1. On GitHub, go to Releases → Draft a new release → tag `v1.1-submission`.
+2. On Zenodo, open your existing record → **New version** (not a new
+   record — this keeps one concept DOI with versions underneath it) →
+   upload the updated repo archive (or point it at the new GitHub release
+   if you have the GitHub-Zenodo integration enabled) → publish.
+3. Zenodo will give you a new version-specific DOI. Send it to me and
+   I'll update the citation in the paper (currently `10.5281/zenodo.21826992`)
+   to the new one.
+
+**After that's pushed, two things remain before this is genuinely ready:**
+- Run the v2 corrected GPU re-run (~3 hours) — `benchmark/BENCHMARK_INSTRUCTIONS.md`.
+  Send me results and I'll fold in real confidence intervals across the
+  full concurrency range, replacing the current single-cell-exploratory
+  framing, and do the final rebuild + another Zenodo version.
+- #5 (human evaluation) — once your evaluators finish rating
+  `data/human_eval_sample_blind.csv` against `HUMAN_EVAL_PROTOCOL.md`,
+  run `scripts/analyze_human_eval.py` and send me `results/human_eval_summary.csv`.
+
+#2/#3/#4 remain deliberately not started per your no-extra-budget call.

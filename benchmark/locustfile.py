@@ -49,6 +49,20 @@ COMPRESSION_RATIO = float(os.getenv("COMPRESSION_RATIO", "0.5"))
 MODEL_NAME = os.getenv("VLLM_MODEL_NAME", "meta-llama/Llama-3.1-8B-Instruct")
 PRUNER_MODEL_NAME = os.getenv("PRUNER_MODEL_NAME", "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1")
 
+# If set (run_full_sweep.py sets this by default -- see precompute_contexts.py
+# and paper Section 5.8/8), every context is a plain dict lookup instead of
+# live computation inside this process. This exists specifically to remove
+# LSPM's cross-encoder scoring from the Locust load-generator process, which
+# the paper identifies as a likely client-side bottleneck confounding the
+# between-method comparison at higher concurrency in the original run.
+PRECOMPUTED_CONTEXTS_PATH = os.getenv("PRECOMPUTED_CONTEXTS_PATH")
+_PRECOMPUTED = None
+if PRECOMPUTED_CONTEXTS_PATH:
+    with open(PRECOMPUTED_CONTEXTS_PATH, encoding="utf-8") as _f:
+        _PRECOMPUTED = json.load(_f)
+
+MAX_TOKENS = int(os.getenv("MAX_TOKENS", "256"))
+
 SAMPLE_QUERIES = [
     "متى تأسست جامعة الملك سعود؟",
     "ما هي اهتمامات قسم الحاسب في الجامعة؟",
@@ -59,7 +73,9 @@ SAMPLE_QUERIES = [
 
 SYSTEM_PROMPT = "أنت مساعد ذكي تجيب بدقة بالاعتماد فقط على السياق المتاح لك وبشكل مختصر."
 
-_pruner = SemanticPruner(model_name=PRUNER_MODEL_NAME) if RAG_MODE == "lspm" else None
+# Only load the cross-encoder in this process if we're NOT using precomputed
+# contexts -- this is the whole point of the precomputed-lookup path.
+_pruner = SemanticPruner(model_name=PRUNER_MODEL_NAME) if (RAG_MODE == "lspm" and _PRECOMPUTED is None) else None
 
 
 def naive_truncate(documents, compression_ratio):
@@ -78,6 +94,17 @@ def naive_truncate(documents, compression_ratio):
 
 
 def build_context(query: str) -> str:
+    if _PRECOMPUTED is not None:
+        ratio_key = COMPRESSION_RATIO if RAG_MODE != "raw" else None
+        lookup_key = f"{RAG_MODE}|{ratio_key}|{query}"
+        try:
+            return _PRECOMPUTED[lookup_key]
+        except KeyError:
+            raise KeyError(
+                f"No precomputed context for {lookup_key!r} in {PRECOMPUTED_CONTEXTS_PATH}. "
+                "Re-run benchmark/precompute_contexts.py, or unset PRECOMPUTED_CONTEXTS_PATH "
+                "to fall back to live computation."
+            )
     docs = MOCK_CORPUS
     if RAG_MODE == "lspm":
         result = _pruner.prune(query, docs, compression_ratio=COMPRESSION_RATIO)
@@ -101,7 +128,7 @@ class VLLMUser(HttpUser):
                 {"role": "user", "content": f"السياق: {context}\n\nالسؤال: {query}"},
             ],
             "temperature": 0.3,
-            "max_tokens": 256,
+            "max_tokens": MAX_TOKENS,
             "stream": True,
         }
 
@@ -115,6 +142,11 @@ class VLLMUser(HttpUser):
                 "/v1/chat/completions", json=payload, catch_response=True, stream=True, name=name
             ) as resp:
                 if resp.status_code != 200:
+                    # DEBUG: print the real URL and body once so we can see
+                    # why the server rejected this specific request (curl
+                    # against the same path succeeds, so this is here to
+                    # catch a locust-side URL/payload mismatch).
+                    print(f"DEBUG FAILURE: url={resp.url!r} status={resp.status_code} body={resp.text[:300]!r}")
                     resp.failure(f"status={resp.status_code}")
                     return
                 for line in resp.iter_lines():

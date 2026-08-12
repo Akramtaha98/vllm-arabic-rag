@@ -19,7 +19,13 @@ import time
 
 import requests
 
-METRIC_PATTERN = re.compile(r"^vllm:gpu_cache_usage_perc(\{[^}]*\})?\s+([0-9.eE+-]+)\s*$", re.MULTILINE)
+# GPU vLLM builds expose vllm:gpu_cache_usage_perc; CPU builds (and some
+# newer vLLM versions) expose vllm:kv_cache_usage_perc instead. Match either
+# so the same scraper works regardless of which build produced the metrics.
+METRIC_PATTERN = re.compile(
+    r"^vllm:(?:gpu_cache_usage_perc|kv_cache_usage_perc)(\{[^}]*\})?\s+([0-9.eE+-]+)\s*$",
+    re.MULTILINE,
+)
 
 
 def scrape_once(url: str):
