@@ -104,6 +104,52 @@ def check_network_profile_parser():
     assert loss.group(1) == "0"
 
 
+def check_application_level_emulation_helpers():
+    # Fallback path used when CAP_NET_ADMIN is unavailable (confirmed on some
+    # RunPod pods -- both tc netem and unshare --net return "Operation not
+    # permitted" there). See network_profiles.py's module docstring.
+    from benchmark.network_profiles import (
+        sample_uplink_delay_s, sample_downlink_delay_s, should_drop_request,
+        bandwidth_throttle_sleep_s, check_tc_capability, PROFILES,
+    )
+
+    # Delay sampling: near-zero-jitter profile should stay tightly clustered
+    # around half the requested delay; must never go negative.
+    samples = [sample_uplink_delay_s("edge_lan") for _ in range(200)]
+    assert all(s >= 0.0 for s in samples), "uplink delay sample went negative"
+    expected_mean_s = (PROFILES["edge_lan"]["delay_ms"] / 2.0) / 1000.0
+    observed_mean = sum(samples) / len(samples)
+    assert abs(observed_mean - expected_mean_s) < 0.01, \
+        f"edge_lan uplink delay mean {observed_mean:.4f}s far from expected {expected_mean_s:.4f}s"
+    assert sample_downlink_delay_s("edge_lan") >= 0.0
+
+    # A profile with 0% configured loss should (almost) never drop; a lossy
+    # profile should drop noticeably more often, over enough trials.
+    zero_loss_drops = sum(should_drop_request("edge_lan") for _ in range(500))
+    assert zero_loss_drops == 0, f"edge_lan has loss_pct=0 but dropped {zero_loss_drops}/500 requests"
+    lossy_drops = sum(should_drop_request("constrained_wireless") for _ in range(2000))
+    expected_lossy = 2000 * (PROFILES["constrained_wireless"]["loss_pct"] / 100.0)
+    assert abs(lossy_drops - expected_lossy) < expected_lossy * 0.6 + 5, \
+        f"constrained_wireless loss rate {lossy_drops}/2000 far from expected ~{expected_lossy:.0f}"
+
+    # Bandwidth throttle: a transfer that was already slower than the cap
+    # needs zero extra sleep; a transfer far faster than the cap needs sleep
+    # roughly equal to (bits / rate) - elapsed.
+    assert bandwidth_throttle_sleep_s("edge_lan", n_bytes=1000, elapsed_s=10.0) == 0.0
+    rate_mbit = PROFILES["constrained_wireless"]["rate_mbit"]
+    n_bytes = 1_000_000  # 1 MB
+    min_required_s = (n_bytes * 8 / 1_000_000) / rate_mbit
+    throttle = bandwidth_throttle_sleep_s("constrained_wireless", n_bytes=n_bytes, elapsed_s=0.001)
+    assert abs(throttle - min_required_s) < 0.01, f"expected ~{min_required_s:.3f}s throttle, got {throttle:.3f}s"
+
+    # Capability check must degrade gracefully (return False, not raise) on
+    # a nonexistent interface -- this is what run_validation_grid.py should
+    # rely on before trusting --emulation-mode tc.
+    ok, detail = check_tc_capability("this-iface-does-not-exist-0xdeadbeef")
+    assert ok is False, "expected tc capability check to report False for a nonexistent interface"
+    assert isinstance(detail, str) and len(detail) > 0
+
+
 def check_metrics_scraper_graceful_failure():
     from benchmark.metrics_scraper import scrape_once, scrape_gpu_util
     val, err = scrape_once("http://127.0.0.1:1/metrics")
@@ -168,6 +214,7 @@ def main():
     check("request manifest reproducibility", check_manifest_reproducible)
     check("network-aware controller logic", check_controller_logic)
     check("network profile ping-parser", check_network_profile_parser)
+    check("application-level network emulation helpers", check_application_level_emulation_helpers)
     check("metrics scraper graceful failure", check_metrics_scraper_graceful_failure)
     check("warmup.py fails cleanly on unreachable host", check_warmup_fails_cleanly)
     check("edge gateway live server + logging", check_edge_gateway_live_server)

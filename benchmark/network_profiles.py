@@ -27,10 +27,48 @@ Usage:
     python benchmark/network_profiles.py --iface eth0 --profile moderate_wan --apply
     python benchmark/network_profiles.py --iface eth0 --profile moderate_wan --verify --target 10.0.0.5
     python benchmark/network_profiles.py --iface eth0 --reset
+
+--------------------------------------------------------------------------
+FALLBACK: APPLICATION-LEVEL EMULATION (no CAP_NET_ADMIN available)
+--------------------------------------------------------------------------
+Confirmed on the RunPod pod used for this experiment (2026-08-13): the
+container has neither CAP_NET_ADMIN (`tc qdisc add ... netem` ->
+"RTNETLINK answers: Operation not permitted") nor unprivileged user
+namespaces (`unshare --net ...` -> "unshare: unshare failed: Operation not
+permitted"). Kernel-level packet shaping is therefore NOT POSSIBLE in this
+deployment, full stop -- there is no further privilege-escalation path to
+try from inside the container.
+
+The functions below (`sample_uplink_delay_s`, `sample_downlink_delay_s`,
+`should_drop_request`, `bandwidth_throttle_sleep_s`) implement a SOFTWARE
+fallback: the edge gateway (edge_gateway.py, when started with
+NETWORK_EMULATION_MODE=application) injects delay/jitter before sending
+each request to the cloud tier and delay/jitter/bandwidth-throttling after
+receiving the response, and randomly fails a fraction of requests to
+stand in for packet loss. This is DELIBERATELY NOT presented as equivalent
+to tc netem:
+
+  - It shapes one HTTP request/response at a time, in userspace, on top of
+    whatever the real (unshaped) TCP connection does -- it does not touch
+    packets, does not interact with TCP congestion control the way real
+    delay/loss would, and cannot reproduce reordering.
+  - "Loss" is modeled as whole-request failure, not per-packet loss with
+    retransmission.
+  - The delay split (half applied before the request, half plus the
+    bandwidth throttle applied after the full response is buffered) is a
+    simplifying, documented modeling choice, not a measurement.
+
+Any table or figure built from NETWORK_EMULATION_MODE=application data
+MUST say "application-level emulation" explicitly and must not be
+described with the same "emulated network profile" language used
+elsewhere for tc-netem-based results, per the paper's own disclosure
+requirement (see this module's docstring above and
+paper/NETWORK_SPECIALIZATION_PLAN.md Section 0).
 """
 from __future__ import annotations
 
 import argparse
+import random
 import re
 import statistics
 import subprocess
@@ -130,6 +168,61 @@ def apply_profile(iface: str, profile_name: str) -> AppliedProfile:
     )
 
 
+def check_tc_capability(iface: str) -> tuple[bool, str]:
+    """Cheap capability probe: tries a real tc qdisc add/del on `iface` and
+    reports whether it actually worked, rather than assuming. Used by
+    run_validation_grid.py to fail loudly (not silently fall back to
+    unshaped traffic) if --emulation-mode tc is requested somewhere that
+    can't actually do it."""
+    result = subprocess.run(
+        ["tc", "qdisc", "add", "dev", iface, "root", "netem", "delay", "1ms"],
+        capture_output=True, text=True,
+    )
+    if result.returncode == 0:
+        subprocess.run(["tc", "qdisc", "del", "dev", iface, "root"], capture_output=True, text=True)
+        return True, "tc netem works on this interface"
+    return False, (result.stderr.strip() or "tc qdisc add failed with no stderr output")
+
+
+# --------------------------------------------------------------------------
+# Application-level emulation helpers (see module docstring's fallback
+# section). Consumed by edge_gateway.py, not by this module's own CLI.
+# --------------------------------------------------------------------------
+def sample_uplink_delay_s(profile_name: str) -> float:
+    """One-way delay sample, in seconds: half of the profile's round-trip
+    delay+jitter, Gaussian, floored at 0. Documented simplifying
+    assumption: the round-trip delay is split evenly between the
+    uplink (client->cloud) and downlink (cloud->client) legs."""
+    p = PROFILES[profile_name]
+    mean_s = (p["delay_ms"] / 2.0) / 1000.0
+    jitter_s = (p["jitter_ms"] / 2.0) / 1000.0
+    sampled = random.gauss(mean_s, jitter_s) if jitter_s > 0 else mean_s
+    return max(0.0, sampled)
+
+
+def sample_downlink_delay_s(profile_name: str) -> float:
+    return sample_uplink_delay_s(profile_name)  # same symmetric-split assumption
+
+
+def should_drop_request(profile_name: str) -> bool:
+    """Whole-request failure with probability loss_pct/100 -- a coarser
+    stand-in for tc netem's per-packet loss (see module docstring)."""
+    p = PROFILES[profile_name]
+    return random.random() < (p["loss_pct"] / 100.0)
+
+
+def bandwidth_throttle_sleep_s(profile_name: str, n_bytes: int, elapsed_s: float) -> float:
+    """Extra sleep (seconds) needed so that transferring n_bytes over
+    elapsed_s does not exceed the profile's rate_mbit. Returns 0 if the
+    transfer was already slower than the cap (never speeds anything up)."""
+    p = PROFILES[profile_name]
+    rate_mbit = p["rate_mbit"]
+    if rate_mbit <= 0 or n_bytes <= 0:
+        return 0.0
+    min_required_s = (n_bytes * 8 / 1_000_000) / rate_mbit
+    return max(0.0, min_required_s - elapsed_s)
+
+
 _PING_RTT_RE = re.compile(r"time=([\d.]+)\s*ms")
 _PING_LOSS_RE = re.compile(r"([\d.]+)% packet loss")
 
@@ -167,7 +260,16 @@ def main():
     ap.add_argument("--verify", action="store_true")
     ap.add_argument("--target", help="Host to ping for --verify (the cloud tier's address)")
     ap.add_argument("--count", type=int, default=20)
+    ap.add_argument("--check-capability", action="store_true",
+                     help="Test whether tc netem actually works on --iface (tries a real add+del) "
+                          "and exit. Use this before trusting --emulation-mode tc in run_validation_grid.py.")
     args = ap.parse_args()
+
+    if args.check_capability:
+        ok, detail = check_tc_capability(args.iface)
+        print(f"tc netem capability on {args.iface}: {'AVAILABLE' if ok else 'NOT AVAILABLE'}")
+        print(f"  {detail}")
+        sys.exit(0 if ok else 1)
 
     if args.reset:
         reset_profile(args.iface)

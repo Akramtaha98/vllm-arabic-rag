@@ -37,9 +37,20 @@ Environment variables:
     NETWORK_PROBE_INTERVAL_S  seconds between background RTT/bandwidth probes (default 2.0)
     REQUEST_LOG_PATH        JSONL output path (default results/edge_gateway_log.jsonl)
     PRECOMPUTED_CONTEXTS_PATH  optional, same lookup-table mechanism as locustfile.py
+    NETWORK_EMULATION_MODE  "none" (default) | "application". When "application", every
+                             /generate request has delay/jitter/loss/bandwidth-throttling
+                             injected in software, keyed by the per-request `profile_name`
+                             field, using benchmark/network_profiles.py's PROFILES table.
+                             This is a fallback for environments without CAP_NET_ADMIN
+                             (confirmed necessary on the RunPod pod this was deployed on --
+                             see network_profiles.py's module docstring for why, and for the
+                             explicit disclosure requirement this implies for the paper).
+                             Do NOT set this if real tc-netem shaping is being applied
+                             upstream of this process -- the two would stack.
 """
 from __future__ import annotations
 
+import asyncio
 import json
 import os
 import re
@@ -64,6 +75,7 @@ from middleware.retriever import MOCK_CORPUS  # noqa: E402
 from benchmark.network_controller import (  # noqa: E402
     NetworkAwareController, KVOnlyDecision, NetworkAwareDecision, snap_to_validated_ratio,
 )
+from benchmark import network_profiles  # noqa: E402
 
 CLOUD_VLLM_URL = os.environ["CLOUD_VLLM_URL"].rstrip("/")
 CONTROLLER_MODE = os.getenv("CONTROLLER_MODE", "fixed")  # fixed | kv_only | network_aware
@@ -75,6 +87,9 @@ PRECOMPUTED_CONTEXTS_PATH = os.getenv("PRECOMPUTED_CONTEXTS_PATH")
 PRUNER_MODEL_NAME = os.getenv("PRUNER_MODEL_NAME", "cross-encoder/mmarco-mMiniLMv2-L12-H384-v1")
 MODEL_NAME = os.getenv("VLLM_MODEL_NAME", "meta-llama/Llama-3.1-8B-Instruct")
 MAX_TOKENS = int(os.getenv("MAX_TOKENS", "256"))
+NETWORK_EMULATION_MODE = os.getenv("NETWORK_EMULATION_MODE", "none")  # "none" | "application"
+if NETWORK_EMULATION_MODE not in ("none", "application"):
+    raise ValueError(f"NETWORK_EMULATION_MODE must be 'none' or 'application', got {NETWORK_EMULATION_MODE!r}")
 
 Path(REQUEST_LOG_PATH).parent.mkdir(parents=True, exist_ok=True)
 _log_lock = threading.Lock()
@@ -258,12 +273,18 @@ def _startup():
     if probe is not None:
         probe.start()
     print(f"Edge gateway up. cloud={CLOUD_VLLM_URL} controller_mode={CONTROLLER_MODE} "
-          f"probe_target={NETWORK_PROBE_TARGET} log={REQUEST_LOG_PATH}")
+          f"probe_target={NETWORK_PROBE_TARGET} log={REQUEST_LOG_PATH} "
+          f"network_emulation_mode={NETWORK_EMULATION_MODE}")
+    if NETWORK_EMULATION_MODE == "application":
+        print("  NOTE: application-level network emulation is ACTIVE. Delay/jitter/loss/"
+              "bandwidth-throttle are injected in software per request, keyed by profile_name. "
+              "This is NOT kernel-level tc netem shaping -- see network_profiles.py docstring.")
 
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "cloud_vllm_url": CLOUD_VLLM_URL, "controller_mode": CONTROLLER_MODE}
+    return {"status": "ok", "cloud_vllm_url": CLOUD_VLLM_URL, "controller_mode": CONTROLLER_MODE,
+             "network_emulation_mode": NETWORK_EMULATION_MODE}
 
 
 SYSTEM_PROMPT = "أنت مساعد ذكي تجيب بدقة بالاعتماد فقط على السياق المتاح لك وبشكل مختصر."
@@ -298,7 +319,29 @@ async def generate(req: Request):
     }
     request_bytes = len(json.dumps(payload).encode("utf-8"))
 
+    # ----------------------------------------------------------------
+    # Application-level network emulation (fallback for no CAP_NET_ADMIN --
+    # see network_profiles.py module docstring). Loss is checked first: a
+    # "lost" request never reaches the cloud tier at all. t_send is stamped
+    # BEFORE the uplink sleep, so the sleep is naturally folded into
+    # ttft_ms and total_latency_ms below (both measured relative to
+    # t_send), the same way real network delay would show up to a client.
+    # ----------------------------------------------------------------
     t_send = time.time()
+    uplink_delay_s = 0.0
+    emulation_active = NETWORK_EMULATION_MODE == "application" and profile_name in network_profiles.PROFILES
+    if emulation_active and network_profiles.should_drop_request(profile_name):
+        tracker.leave_inflight()
+        _log({
+            "request_id": request_id, "epoch": t_recv, "method": method, "ratio": ratio,
+            "profile_name": profile_name, "status": "emulated_loss",
+            "network_emulation_mode": NETWORK_EMULATION_MODE,
+        })
+        return {"error": "emulated_network_loss", "profile_name": profile_name}
+    if emulation_active:
+        uplink_delay_s = network_profiles.sample_uplink_delay_s(profile_name)
+        await asyncio.sleep(uplink_delay_s)
+
     ttft_ms = None
     usage = None
     response_bytes = 0
@@ -314,6 +357,7 @@ async def generate(req: Request):
                         "request_id": request_id, "epoch": t_recv, "method": method, "ratio": ratio,
                         "profile_name": profile_name, "status": "http_error",
                         "http_status": resp.status_code, "body_snippet": body_text[:300].decode(errors="replace"),
+                        "network_emulation_mode": NETWORK_EMULATION_MODE,
                     })
                     return {"error": "cloud_http_error", "status": resp.status_code}
                 async for line in resp.aiter_lines():
@@ -343,16 +387,43 @@ async def generate(req: Request):
         _log({
             "request_id": request_id, "epoch": t_recv, "method": method, "ratio": ratio,
             "profile_name": profile_name, "status": "exception", "error": str(e),
+            "network_emulation_mode": NETWORK_EMULATION_MODE,
         })
         return {"error": "exception", "detail": str(e)}
 
     t_done = time.time()
     tracker.leave_inflight()
-    total_latency_ms = (t_done - t_send) * 1000
     answer_text = "".join(chunks)
     probe.record_transfer(response_bytes, t_done - t_send) if probe else None
 
+    # Downlink delay + bandwidth throttle, applied after the full response
+    # is buffered (this gateway returns one JSON response, not a live
+    # stream to the client -- see module docstring -- so "downlink" here
+    # means the emulated cloud->edge leg, not edge->client). t_done is
+    # re-stamped after these sleeps so total_latency_ms reflects them;
+    # ttft_ms deliberately is NOT adjusted here since first-token time
+    # in a real shaped network would be governed by uplink + propagation,
+    # not by the full-response bandwidth cap.
+    downlink_delay_s = 0.0
+    bandwidth_throttle_s = 0.0
+    if emulation_active:
+        downlink_delay_s = network_profiles.sample_downlink_delay_s(profile_name)
+        bandwidth_throttle_s = network_profiles.bandwidth_throttle_sleep_s(
+            profile_name, response_bytes, t_done - t_send)
+        await asyncio.sleep(downlink_delay_s + bandwidth_throttle_s)
+        t_done = time.time()
+
+    total_latency_ms = (t_done - t_send) * 1000
+
     in_flight_at_decision, queued_at_decision = tracker.snapshot()  # post-hoc, approximate; see note below
+
+    applied_emulation = None
+    if emulation_active:
+        applied_emulation = {
+            "mode": "application", "profile_name": profile_name,
+            "uplink_delay_s": uplink_delay_s, "downlink_delay_s": downlink_delay_s,
+            "bandwidth_throttle_s": bandwidth_throttle_s,
+        }
 
     record = {
         "request_id": request_id, "epoch": t_recv, "profile_name": profile_name,
@@ -365,6 +436,8 @@ async def generate(req: Request):
         "token_count_source": "usage_field" if usage else "unavailable",
         "request_bytes": request_bytes, "response_bytes": response_bytes,
         "context_char_count": len(context), "status": "ok",
+        "network_emulation_mode": NETWORK_EMULATION_MODE,
+        "applied_emulation": applied_emulation,
     }
     _log(record)
     return {

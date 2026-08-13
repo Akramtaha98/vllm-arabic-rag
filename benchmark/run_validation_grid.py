@@ -15,14 +15,20 @@ instrumentation is trustworthy and whether the previously observed
 high-concurrency KV-cache reversal (paper Section 5.8) persists in this new
 edge-cloud topology, BEFORE spending GPU budget on the full grid.
 
-REQUIRES (none of which are available in the sandbox this script was
-authored in -- see the module's accompanying status report):
+REQUIRES:
     - A running cloud-tier vLLM server (same setup as BENCHMARK_INSTRUCTIONS.md)
     - A running edge gateway (benchmark/edge_gateway.py) reachable at --edge-host
-    - Root or CAP_NET_ADMIN on the edge machine, to shape --edge-iface with tc netem
     - A request manifest (benchmark/request_manifest.py), long enough for the
       grid's total request count (this script checks and refuses to proceed
       on an under-length manifest rather than silently wrapping it)
+    - EITHER root/CAP_NET_ADMIN on the edge machine to shape --edge-iface with
+      tc netem (--emulation-mode tc, the default), OR the edge gateway started
+      with NETWORK_EMULATION_MODE=application (--emulation-mode application),
+      for environments without CAP_NET_ADMIN -- confirmed necessary on the
+      RunPod pod this was first deployed on: both `tc qdisc add ... netem`
+      and `unshare --net ...` fail there with "Operation not permitted".
+      See network_profiles.py's module docstring for what application-level
+      emulation does and does not reproduce, and its required disclosure.
 
 This script NEVER fabricates a missing measurement. Every cell's outcome is
 one of: "ok" (locust + metrics scraper both exited cleanly and produced
@@ -88,7 +94,24 @@ def main():
     ap.add_argument("--manifest-path", default=str(ROOT / "benchmark" / "request_manifest.json"))
     ap.add_argument("--out-dir", default="results/validation_grid")
     ap.add_argument("--gpu-util", action="store_true", help="Also sample nvidia-smi during each cell (see metrics_scraper.py)")
+    ap.add_argument("--emulation-mode", choices=["tc", "application"], default="tc",
+                     help="'tc' (default): kernel-level tc netem on --edge-iface, requires CAP_NET_ADMIN. "
+                          "'application': skip tc entirely and rely on the edge gateway process having been "
+                          "started with NETWORK_EMULATION_MODE=application, which injects delay/jitter/loss/"
+                          "bandwidth-throttle in software per request. Use 'application' if "
+                          "`python benchmark/network_profiles.py --iface <iface> --check-capability` reports "
+                          "tc is NOT AVAILABLE.")
     args = ap.parse_args()
+
+    if args.emulation_mode == "application":
+        print("=" * 78)
+        print("--emulation-mode application: this script will NOT touch --edge-iface at all.")
+        print("Network shaping only happens if the EDGE GATEWAY PROCESS was started with")
+        print("NETWORK_EMULATION_MODE=application. If it was started with that unset (or 'none'),")
+        print("every cell below will silently run over the real UNSHAPED link. Verify now with:")
+        print(f"  curl -s {args.edge_host.rstrip('/')}/health")
+        print("and confirm the response includes \"network_emulation_mode\": \"application\" before proceeding.")
+        print("=" * 78)
 
     manifest_path = Path(args.manifest_path)
     if not manifest_path.exists():
@@ -116,40 +139,60 @@ def main():
 
     results = []
     for profile in PROFILES:
-        print(f"\n=== Applying network profile: {profile} on {args.edge_iface} ===")
-        try:
-            applied = network_profiles.apply_profile(args.edge_iface, profile)
-        except Exception as e:
-            print(f"FATAL: could not apply profile {profile!r}: {e}")
-            print("Every cell under this profile will be recorded as failed with reason 'profile_apply_failed'. "
-                  "NOT substituting an unshaped link and pretending the profile was applied.")
-            for method in METHODS:
-                for users in CONCURRENCY:
-                    for rep in range(1, args.repeats + 1):
-                        rec = {"cell": cell_tag(profile, method, users, rep), "status": "failed",
-                               "reason": "profile_apply_failed", "detail": str(e)}
-                        results.append(rec)
-                        _append_log(rec)
-            continue
+        if args.emulation_mode == "tc":
+            print(f"\n=== Applying network profile: {profile} on {args.edge_iface} (tc netem) ===")
+            try:
+                applied = network_profiles.apply_profile(args.edge_iface, profile)
+            except Exception as e:
+                print(f"FATAL: could not apply profile {profile!r}: {e}")
+                print("Every cell under this profile will be recorded as failed with reason 'profile_apply_failed'. "
+                      "NOT substituting an unshaped link and pretending the profile was applied.")
+                for method in METHODS:
+                    for users in CONCURRENCY:
+                        for rep in range(1, args.repeats + 1):
+                            rec = {"cell": cell_tag(profile, method, users, rep), "status": "failed",
+                                   "reason": "profile_apply_failed", "detail": str(e)}
+                            results.append(rec)
+                            _append_log(rec)
+                continue
 
-        verified = network_profiles.verify_profile(profile, args.ping_target, count=15)
-        print(f"  Verified: requested_delay={verified.requested_delay_ms}ms "
-              f"measured_rtt_mean={verified.measured_rtt_mean_ms}ms "
-              f"measured_rtt_stddev={verified.measured_rtt_stddev_ms}ms loss={verified.ping_loss_pct}%")
-        if verified.measured_rtt_mean_ms is None:
-            print(f"FATAL: profile {profile!r} applied but verification ping failed entirely. "
-                  "Recording every cell under this profile as failed rather than trusting an unverified link.")
-            for method in METHODS:
-                for users in CONCURRENCY:
-                    for rep in range(1, args.repeats + 1):
-                        rec = {"cell": cell_tag(profile, method, users, rep), "status": "failed",
-                               "reason": "profile_verify_failed"}
-                        results.append(rec)
-                        _append_log(rec)
-            continue
+            verified = network_profiles.verify_profile(profile, args.ping_target, count=15)
+            print(f"  Verified: requested_delay={verified.requested_delay_ms}ms "
+                  f"measured_rtt_mean={verified.measured_rtt_mean_ms}ms "
+                  f"measured_rtt_stddev={verified.measured_rtt_stddev_ms}ms loss={verified.ping_loss_pct}%")
+            if verified.measured_rtt_mean_ms is None:
+                print(f"FATAL: profile {profile!r} applied but verification ping failed entirely. "
+                      "Recording every cell under this profile as failed rather than trusting an unverified link.")
+                for method in METHODS:
+                    for users in CONCURRENCY:
+                        for rep in range(1, args.repeats + 1):
+                            rec = {"cell": cell_tag(profile, method, users, rep), "status": "failed",
+                                   "reason": "profile_verify_failed"}
+                            results.append(rec)
+                            _append_log(rec)
+                continue
 
-        _append_log({"event": "profile_applied", "profile": profile,
-                      "requested": applied.requested, "verified": verified.__dict__})
+            _append_log({"event": "profile_applied", "profile": profile, "emulation_mode": "tc",
+                          "requested": applied.requested, "verified": verified.__dict__})
+        else:
+            # application mode: no tc call at all. The gateway process (started
+            # separately with NETWORK_EMULATION_MODE=application) applies
+            # delay/jitter/loss/throttle per request, keyed by the profile_name
+            # sent in each request -- see locustfile_edge.py / edge_gateway.py.
+            # We still ping the real link for disclosure of the UNSHAPED
+            # baseline, but explicitly label it as such so it is never mistaken
+            # for the applied condition.
+            print(f"\n=== Profile: {profile} (application-level emulation, gateway-side) ===")
+            baseline = network_profiles.verify_profile(profile, args.ping_target, count=15)
+            print(f"  Baseline (UNSHAPED) link to {args.ping_target}: "
+                  f"measured_rtt_mean={baseline.measured_rtt_mean_ms}ms loss={baseline.ping_loss_pct}% "
+                  f"-- actual emulated delay/jitter/loss is applied inside the gateway process, "
+                  f"see its REQUEST_LOG_PATH's applied_emulation field per request.")
+            _append_log({"event": "profile_baseline_measured_application_mode", "profile": profile,
+                          "emulation_mode": "application",
+                          "note": "baseline is the real unshaped link; applied emulation is logged "
+                                  "per-request by edge_gateway.py, not here",
+                          "baseline_unshaped": baseline.__dict__})
 
         for users in CONCURRENCY:
             for method in METHODS:
@@ -207,7 +250,8 @@ def main():
                     _append_log(cell_result)
                     print(f"[{tag}] -> {cell_result['status']}" + (f" ({cell_result.get('reason')})" if cell_result["status"] == "failed" else ""))
 
-        network_profiles.reset_profile(args.edge_iface)
+        if args.emulation_mode == "tc":
+            network_profiles.reset_profile(args.edge_iface)
 
     n_ok = sum(1 for r in results if r["status"] == "ok")
     n_failed = sum(1 for r in results if r["status"] == "failed")
