@@ -145,13 +145,30 @@ Then, since the currently-cited Zenodo DOI predates all of this:
    I'll update the citation in the paper (currently `10.5281/zenodo.21826992`)
    to the new one.
 
-**After that's pushed, two things remain before this is genuinely ready:**
+## Round 8: #5 (human evaluation) — done, folded into the manuscript
+
+Both evaluators finished rating `data/human_eval_sample_blind.csv` (90/90
+rows each); `scripts/merge_human_eval_ratings.py` merged the two per-rater
+sheets and `scripts/analyze_human_eval.py` produced
+`results/human_eval_summary.csv`: mean correctness/faithfulness by method
+(raw 1.717/0.933, LSPM 1.800/0.983, naive 1.550/0.800, n=30 each) with
+Cohen's kappa 0.794 (correctness) / 0.935 (faithfulness) — substantial to
+near-perfect inter-rater agreement. This is folded into the manuscript as
+new Section 4.10 (methodology) and Section 5.9 (results, Table 9), plus
+updates to the abstract, contributions list, Discussion, Limitations,
+Future Work, Conclusion, Ethics declaration, Data Availability, and a new
+Appendix H. PDF rebuilt: 40 pages, clean compile, no Overfull/Undefined
+warnings. Closes the "automatic metrics only" gap specifically at r = 0.3.
+
+**Still needed before this is genuinely ready:**
+- Push this round's changes (see git commands below) and merge with the
+  pod's earlier commits (already resolved per your terminal output, minor
+  conflict in `metrics_scraper.py` — just needs `git add`/`commit`/`push`
+  if not already done).
 - Run the v2 corrected GPU re-run (~3 hours) — `benchmark/BENCHMARK_INSTRUCTIONS.md`.
   Send me results and I'll fold in real confidence intervals across the
   full concurrency range, replacing the current single-cell-exploratory
-  framing, and do the final rebuild + another Zenodo version.
-- #5 (human evaluation) — once your evaluators finish rating
-  `data/human_eval_sample_blind.csv` against `HUMAN_EVAL_PROTOCOL.md`,
-  run `scripts/analyze_human_eval.py` and send me `results/human_eval_summary.csv`.
+  framing, and do the final rebuild + another Zenodo version archiving
+  everything from this round too.
 
 #2/#3/#4 remain deliberately not started per your no-extra-budget call.

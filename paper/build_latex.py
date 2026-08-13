@@ -219,6 +219,10 @@ def build():
                 "TTFT p50 / p95 (ms)": "TTFT p50/p95 (ms)",
                 "Mean / Peak KV-cache (%)": "Mean/Peak KV (%)",
                 "Completion tok/s": "Tok/s",
+                "Correctness 95% CI": "Correct. CI",
+                "Faithfulness 95% CI": "Faithful. CI",
+                "Correctness (0-2)": "Correct. (0-2)",
+                "Faithfulness (0-1)": "Faithful. (0-1)",
             }
             header_cells = [HEADER_SHORTEN.get(c, c) for c in header_cells]
             data_rows = []
@@ -245,7 +249,10 @@ def build():
             # -- doesn't tolerate \resizebox directly around \tabular there:
             # it throws "Division by 0" and visibly corrupts the page. Font
             # size + tabcolsep is the safe fix for this class.)
-            needs_shrink = caption_latex is not None and "least time-confounded" in caption_latex
+            needs_shrink = caption_latex is not None and (
+                "least time-confounded" in caption_latex
+                or "Human-rated correctness and faithfulness" in caption_latex
+            )
             out.append(r"\scriptsize" if needs_shrink else r"\footnotesize")
             out.append(r"\setlength{\tabcolsep}{2pt}" if needs_shrink else r"\setlength{\tabcolsep}{3.5pt}")
             out.append(f"\\begin{{tabular}}{{{colspec}}}")
