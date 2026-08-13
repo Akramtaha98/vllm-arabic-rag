@@ -46,6 +46,7 @@ validation grid runnable at all.
 """
 from __future__ import annotations
 
+import asyncio
 import time
 from dataclasses import dataclass, field, asdict
 from typing import Optional
@@ -174,9 +175,16 @@ class KVOnlyDecision:
         ))
         self.min_ratio, self.max_ratio = min_ratio, max_ratio
 
-    def decide(self, fallback_ratio: float = 0.5) -> NetworkAwareDecision:
-        usage = self._impl._fetch_gpu_cache_usage()
-        ratio_cont = self._impl.get_ratio(fallback_ratio=fallback_ratio)
+    async def decide(self, fallback_ratio: float = 0.5) -> NetworkAwareDecision:
+        """Async so the underlying synchronous requests.get() call (inside
+        _fetch_gpu_cache_usage) runs in a worker thread via asyncio.to_thread
+        instead of blocking edge_gateway.py's single event loop -- see
+        network_controller.py's module docstring history / the bug this
+        fixes. Fetches usage exactly once and reuses it for get_ratio(),
+        instead of the old code path that fetched twice (once here, once
+        again inside get_ratio() with no usage argument)."""
+        usage = await asyncio.to_thread(self._impl._fetch_gpu_cache_usage)
+        ratio_cont = self._impl.get_ratio(fallback_ratio=fallback_ratio, usage=usage)
         ratio_sel = snap_to_validated_ratio(ratio_cont)
         return NetworkAwareDecision(
             timestamp=time.time(), controller="kv_only",

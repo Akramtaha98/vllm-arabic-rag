@@ -153,7 +153,19 @@ class DynamicRatioController:
     low load -> richer context (high ratio).
     """
 
-    METRIC_NAME = "vllm:gpu_cache_usage_perc"
+    # Fixed 2026-08-14: vLLM has shipped both metric names across versions
+    # ("vllm:gpu_cache_usage_perc" in older builds, "vllm:kv_cache_usage_perc"
+    # in the version this project's pod runs). The original single-name
+    # exact-prefix match silently found nothing against the deployed
+    # server -- confirmed via the network-aware validation grid's data:
+    # ratio_requested was exactly 0.5 (the fallback_ratio) for every single
+    # kv_aware request across 90 cells, meaning _fetch_gpu_cache_usage()
+    # always returned None and get_ratio() always took the fallback path.
+    # kv_aware was, in effect, silently running as a second copy of
+    # fixed_lspm the entire time. Matching both names removes that silent
+    # failure mode; a future vLLM rename should be added here too rather
+    # than assumed to already be covered.
+    METRIC_NAMES = ("vllm:gpu_cache_usage_perc", "vllm:kv_cache_usage_perc")
 
     def __init__(self, config: Optional[DynamicRatioConfig] = None):
         self.config = config or DynamicRatioConfig()
@@ -166,16 +178,26 @@ class DynamicRatioController:
             return None
 
         for line in resp.text.splitlines():
-            if line.startswith(self.METRIC_NAME) and not line.startswith("#"):
-                try:
-                    value = float(line.strip().split()[-1])
-                    return value
-                except (ValueError, IndexError):
-                    continue
+            if line.startswith("#"):
+                continue
+            for name in self.METRIC_NAMES:
+                if line.startswith(name):
+                    try:
+                        return float(line.strip().split()[-1])
+                    except (ValueError, IndexError):
+                        continue
         return None
 
-    def get_ratio(self, fallback_ratio: float = 0.5) -> float:
-        usage = self._fetch_gpu_cache_usage()
+    def get_ratio(self, fallback_ratio: float = 0.5, usage: Optional[float] = None) -> float:
+        """`usage`: pass a value already fetched by the caller to avoid a
+        second /metrics round trip (see KVOnlyDecision.decide() in
+        benchmark/network_controller.py, which used to fetch once via
+        _fetch_gpu_cache_usage() and then fetch AGAIN by calling this method
+        with no usage argument -- two blocking HTTP calls where one would
+        do). Leave unset for the original single-call behavior (used by
+        app.py's synchronous Streamlit UI)."""
+        if usage is None:
+            usage = self._fetch_gpu_cache_usage()
         if usage is None:
             return fallback_ratio
 

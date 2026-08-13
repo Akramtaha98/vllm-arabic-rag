@@ -62,7 +62,7 @@ from benchmark import network_profiles  # noqa: E402
 
 PROFILES = ["edge_lan", "constrained_wireless"]
 CONCURRENCY = [1, 10, 50]
-METHODS = ["raw", "naive", "fixed_lspm", "kv_aware", "network_aware"]
+ALL_METHODS = ["raw", "naive", "fixed_lspm", "kv_aware", "network_aware"]
 
 # Rough upper bound on requests a single cell could issue, for the
 # manifest-length check: 50 users x 1 req per ~0.5-2s wait_time x run_time.
@@ -101,7 +101,15 @@ def main():
                           "bandwidth-throttle in software per request. Use 'application' if "
                           "`python benchmark/network_profiles.py --iface <iface> --check-capability` reports "
                           "tc is NOT AVAILABLE.")
+    ap.add_argument("--methods", nargs="+", choices=ALL_METHODS, default=ALL_METHODS,
+                     help="Subset of methods to run (default: all 5). Use this for a targeted re-run "
+                          "after a code fix -- e.g. '--methods kv_aware network_aware' to redo only the "
+                          "two methods affected by a bug, reusing already-clean raw/naive/fixed_lspm data "
+                          "from a prior run instead of re-running everything. State which methods were run "
+                          "in this invocation's --out-dir plainly when reporting results -- a partial rerun "
+                          "must never be silently merged with old data as if it were one uniform run.")
     args = ap.parse_args()
+    METHODS = args.methods
 
     if args.emulation_mode == "application":
         print("=" * 78)

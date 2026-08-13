@@ -47,6 +47,34 @@ Environment variables:
                              explicit disclosure requirement this implies for the paper).
                              Do NOT set this if real tc-netem shaping is being applied
                              upstream of this process -- the two would stack.
+
+Fix history (2026-08-14, after analyzing the first 90-cell validation grid):
+1. decide_ratio()'s kv_aware and network_aware branches made blocking
+   synchronous HTTP calls to /metrics from inside this async handler,
+   freezing the single event loop for every concurrent request during that
+   call. kv_aware made THREE such calls per request (one wasted, two more
+   inside the KV-only controller itself); network_aware made one. This
+   showed up in the grid as artificially inflated TTFT/latency for exactly
+   those two methods at concurrency=50 (kv_aware ~560-680ms TTFT vs
+   ~75-165ms for raw/naive/fixed_lspm) -- an instrumentation artifact, not
+   real controller cost. Fixed by making the metrics fetch async
+   (httpx.AsyncClient here; asyncio.to_thread(...) around the KV-only
+   controller's synchronous `requests` call in network_controller.py) and
+   by no longer fetching kv_pct at all for kv_aware, which never used the
+   shared fetch's result in the first place.
+2. Under NETWORK_EMULATION_MODE=application, the network-aware
+   controller's rtt/bandwidth inputs came from NetworkProbe, which
+   pings/measures the REAL unshaped underlying link -- it cannot see the
+   software-injected delay/throttle applied elsewhere in this file, so the
+   controller was effectively blind to which profile was "active." In the
+   first grid this was confirmed: network_aware's mean selected ratio was
+   statistically identical (0.587) under both edge_lan and
+   constrained_wireless. Fixed: decide_ratio() now feeds the controller the
+   profile's own configured delay_ms/rate_mbit directly when running under
+   application-level emulation (ground truth is known in that mode), and
+   falls back to the real NetworkProbe only when NETWORK_EMULATION_MODE is
+   "none" (i.e. real tc netem shaping a real link, where a live measurement
+   is the only way to know the actual condition).
 """
 from __future__ import annotations
 
@@ -197,10 +225,15 @@ class NetworkProbe:
 probe = NetworkProbe(NETWORK_PROBE_TARGET, NETWORK_PROBE_INTERVAL_S) if NETWORK_PROBE_TARGET else None
 
 
-def _fetch_kv_cache_usage_pct() -> float | None:
+async def _fetch_kv_cache_usage_pct() -> float | None:
+    """Async (httpx.AsyncClient, not the old blocking httpx.get) so this
+    does not freeze the event loop for every other concurrent /generate
+    request while it waits on the network round trip -- see the module
+    docstring's history note on why this changed."""
     try:
-        r = httpx.get(CLOUD_VLLM_URL + "/metrics", timeout=3.0)
-        r.raise_for_status()
+        async with httpx.AsyncClient(timeout=3.0) as client:
+            r = await client.get(CLOUD_VLLM_URL + "/metrics")
+            r.raise_for_status()
     except Exception:
         return None
     m = re.search(r"^vllm:(?:gpu_cache_usage_perc|kv_cache_usage_perc)(\{[^}]*\})?\s+([0-9.eE+-]+)\s*$",
@@ -237,23 +270,42 @@ def build_context(method: str, ratio: float, query: str) -> str:
     return result.pruned_text
 
 
-def decide_ratio(method: str, query: str) -> tuple[float, NetworkAwareDecision | None]:
+def _emulation_active_for(profile_name: str) -> bool:
+    return NETWORK_EMULATION_MODE == "application" and profile_name in network_profiles.PROFILES
+
+
+async def decide_ratio(method: str, query: str, profile_name: str) -> tuple[float, NetworkAwareDecision | None]:
     """Returns (ratio, decision_record_or_None). decision_record is None
     for "raw" (no ratio applies) and "fixed" (no controller decision to log,
     the ratio is a constant), populated for kv_aware/network_aware so every
     adaptive decision is auditable, per Task 5's explicit logging
-    requirement ("Log every input and resulting pruning decision")."""
+    requirement ("Log every input and resulting pruning decision").
+
+    Async: kv_aware and network_aware both may need a real /metrics fetch,
+    and that fetch must not block the event loop for other concurrent
+    requests -- see this module's "Fix history" note above."""
     if method == "raw":
         return None, None
     if method in ("naive", "fixed_lspm"):
         return FIXED_RATIO, None
     in_flight, queued = tracker.snapshot()
-    kv_pct = _fetch_kv_cache_usage_pct()
     if method == "kv_aware":
-        d = KVOnlyDecision(metrics_url=CLOUD_VLLM_URL + "/metrics").decide(fallback_ratio=FIXED_RATIO)
+        # No shared kv_pct fetch here -- KVOnlyDecision does its own single
+        # fetch internally. The old code fetched kv_pct here too and threw
+        # it away for this branch, i.e. a second wasted blocking call.
+        d = await KVOnlyDecision(metrics_url=CLOUD_VLLM_URL + "/metrics").decide(fallback_ratio=FIXED_RATIO)
         return d.ratio_selected, d
     if method == "network_aware":
-        rtt, bw = probe.current() if probe else (None, None)
+        if _emulation_active_for(profile_name):
+            # Real probes can't see software-injected delay/throttle (see
+            # Fix history note 2) -- use the profile's own known parameters
+            # instead of a measurement that would always report the fast
+            # unshaped link.
+            p = network_profiles.PROFILES[profile_name]
+            rtt, bw = float(p["delay_ms"]), float(p["rate_mbit"])
+        else:
+            rtt, bw = probe.current() if probe else (None, None)
+        kv_pct = await _fetch_kv_cache_usage_pct()
         d = _network_aware_controller.decide(
             bandwidth_mbps=bw, rtt_ms=rtt, queue_length=float(queued),
             concurrency=float(in_flight), kv_cache_usage_pct=kv_pct,
@@ -301,7 +353,7 @@ async def generate(req: Request):
     tracker.enter_queue()
     t_recv = time.time()
 
-    ratio, decision = decide_ratio(method, query)
+    ratio, decision = await decide_ratio(method, query, profile_name)
     context = build_context(method, ratio if ratio is not None else FIXED_RATIO, query)
 
     tracker.leave_queue_enter_inflight()
@@ -329,7 +381,7 @@ async def generate(req: Request):
     # ----------------------------------------------------------------
     t_send = time.time()
     uplink_delay_s = 0.0
-    emulation_active = NETWORK_EMULATION_MODE == "application" and profile_name in network_profiles.PROFILES
+    emulation_active = _emulation_active_for(profile_name)
     if emulation_active and network_profiles.should_drop_request(profile_name):
         tracker.leave_inflight()
         _log({

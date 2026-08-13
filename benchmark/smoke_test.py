@@ -150,6 +150,69 @@ def check_application_level_emulation_helpers():
     assert isinstance(detail, str) and len(detail) > 0
 
 
+def check_kv_metric_name_fix_and_async_decide():
+    # Regression test for the 2026-08-14 fixes: (1) DynamicRatioController
+    # must recognize both metric name variants vLLM has shipped, not just
+    # the one that happened to silently fail against this project's pod;
+    # (2) KVOnlyDecision.decide() must now be a coroutine (async), since the
+    # old synchronous version blocked edge_gateway.py's event loop under
+    # concurrency -- confirmed via the first validation grid's data.
+    import asyncio
+    import inspect
+    from middleware.pruning import DynamicRatioController, DynamicRatioConfig
+    from benchmark.network_controller import KVOnlyDecision
+
+    ctrl = DynamicRatioController(DynamicRatioConfig(metrics_url="http://127.0.0.1:1/metrics"))
+    assert "vllm:gpu_cache_usage_perc" in ctrl.METRIC_NAMES
+    assert "vllm:kv_cache_usage_perc" in ctrl.METRIC_NAMES, \
+        "the metric name actually exposed by this project's vLLM build must be recognized"
+
+    # get_ratio(usage=...) must skip fetching entirely when usage is supplied
+    # (this is what removes the old double-fetch inside KVOnlyDecision).
+    ratio_high_load = ctrl.get_ratio(fallback_ratio=0.5, usage=0.9)
+    assert ratio_high_load == ctrl.config.min_ratio, f"expected min_ratio for usage=0.9, got {ratio_high_load}"
+    ratio_low_load = ctrl.get_ratio(fallback_ratio=0.5, usage=0.05)
+    assert ratio_low_load == ctrl.config.max_ratio, f"expected max_ratio for usage=0.05, got {ratio_low_load}"
+
+    kv_only = KVOnlyDecision(metrics_url="http://127.0.0.1:1/metrics")
+    assert inspect.iscoroutinefunction(kv_only.decide), "KVOnlyDecision.decide must be async now"
+    decision = asyncio.run(kv_only.decide(fallback_ratio=0.5))
+    assert decision.fallback_used is True, "unreachable metrics URL should fall back gracefully, not raise"
+    assert decision.ratio_selected == 0.5
+
+
+def check_network_aware_profile_aware_inputs():
+    # Regression test for the fix where the network-aware controller's
+    # rtt/bandwidth inputs, under application-level emulation, must come
+    # from the profile's own configured values (ground truth in that mode)
+    # rather than a real probe of the unshaped underlying link -- confirmed
+    # via the first grid's data that the old code produced statistically
+    # identical ratios under edge_lan and constrained_wireless.
+    import asyncio
+    os.environ["CLOUD_VLLM_URL"] = "http://127.0.0.1:1"
+    os.environ["NETWORK_EMULATION_MODE"] = "application"
+    os.environ.setdefault("PRECOMPUTED_CONTEXTS_PATH", str(_dummy_precomputed()))
+    os.environ.setdefault("REQUEST_LOG_PATH", str(Path(tempfile.mkdtemp()) / "smoke_log2.jsonl"))
+    import importlib
+    import benchmark.edge_gateway as gw
+    importlib.reload(gw)  # pick up the env vars set just above
+
+    ratio_lan, decision_lan = asyncio.run(gw.decide_ratio("network_aware", "test query", "edge_lan"))
+    ratio_wan, decision_wan = asyncio.run(gw.decide_ratio("network_aware", "test query", "constrained_wireless"))
+
+    assert decision_lan.raw_inputs["rtt_ms"] == 1.0, \
+        f"edge_lan should feed rtt_ms=1.0 (its configured delay_ms), got {decision_lan.raw_inputs['rtt_ms']}"
+    assert decision_wan.raw_inputs["rtt_ms"] == 120.0, \
+        f"constrained_wireless should feed rtt_ms=120.0, got {decision_wan.raw_inputs['rtt_ms']}"
+    assert decision_lan.raw_inputs["bandwidth_mbps"] == 1000.0
+    assert decision_wan.raw_inputs["bandwidth_mbps"] == 5.0
+    # Worse network (higher rtt pressure, lower bandwidth) must not select a
+    # LOOSER ratio than the better network -- the two profiles must now
+    # actually differ given these different inputs.
+    assert ratio_wan <= ratio_lan, \
+        f"constrained_wireless ratio ({ratio_wan}) should be <= edge_lan ratio ({ratio_lan})"
+
+
 def check_metrics_scraper_graceful_failure():
     from benchmark.metrics_scraper import scrape_once, scrape_gpu_util
     val, err = scrape_once("http://127.0.0.1:1/metrics")
@@ -215,6 +278,8 @@ def main():
     check("network-aware controller logic", check_controller_logic)
     check("network profile ping-parser", check_network_profile_parser)
     check("application-level network emulation helpers", check_application_level_emulation_helpers)
+    check("kv_aware metric-name fix + async decide()", check_kv_metric_name_fix_and_async_decide)
+    check("network_aware profile-aware rtt/bandwidth inputs", check_network_aware_profile_aware_inputs)
     check("metrics scraper graceful failure", check_metrics_scraper_graceful_failure)
     check("warmup.py fails cleanly on unreachable host", check_warmup_fails_cleanly)
     check("edge gateway live server + logging", check_edge_gateway_live_server)
