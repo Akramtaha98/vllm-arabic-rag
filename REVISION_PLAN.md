@@ -172,3 +172,71 @@ warnings. Closes the "automatic metrics only" gap specifically at r = 0.3.
   everything from this round too.
 
 #2/#3/#4 remain deliberately not started per your no-extra-budget call.
+
+## Round 9: preliminary edge-cloud, network-aware extension — small validation grid run, bugs found and fixed, folded into the manuscript honestly
+
+Implemented and ran the edge-cloud extension sketched as future work in
+earlier rounds: `benchmark/edge_gateway.py` (FastAPI edge tier: retrieval +
+pruning + controller decision + cloud call), two new rule-based
+controllers in `benchmark/network_controller.py` (`KVOnlyDecision`
+wrapping the existing `DynamicRatioController`; `NetworkAwareController`,
+a new 5-input weighted controller), `benchmark/network_profiles.py` (4
+network profiles), and `benchmark/run_validation_grid.py` (orchestrator).
+
+`tc netem` and `unshare --net` both failed with "Operation not permitted"
+on the rented pod (no `CAP_NET_ADMIN`), so network shaping is
+application-level (per-request sleeps/drops inside the gateway), disclosed
+as a coarser model than kernel-level shaping throughout the manuscript.
+
+**First run (90 cells, 5 methods x 2 profiles x 3 concurrency x 3 reps):**
+0 failures, but post-run analysis found 3 real bugs, none affecting
+raw/naive/fixed_lspm: (1) `DynamicRatioController` matched only
+`vllm:gpu_cache_usage_perc`, not the deployed vLLM's
+`vllm:kv_cache_usage_perc`, so `kv_aware` silently ran as a second
+`fixed_lspm` the whole time; (2) blocking synchronous HTTP calls inside
+`async def` handlers froze the event loop under concurrency, inflating
+TTFT for both adaptive methods at c=50; (3) `network_aware` measured the
+real unshaped loopback link instead of the active emulation profile, so
+it produced the same ratio regardless of profile.
+
+**Fixed all three** (async HTTP clients, single non-blocking controller
+fetch, profile-aware controller inputs), added 2 new regression checks to
+`benchmark/smoke_test.py` (now 10/10 passing), and **re-ran the 36
+affected cells** (`kv_aware`/`network_aware` x 2 profiles x 3 concurrency
+x 3 reps) on a fresh pod: 0 failures. After the fix, `network_aware`
+correctly differentiates its ratio by profile (0.700 `edge_lan` vs. 0.500
+`constrained_wireless`, continuous means 0.674 vs. 0.530) — it did not do
+this before. The fix also unmasked, rather than removed, a real
+per-request `/metrics`-polling cost: `network_aware`'s TTFT got *worse* at
+every concurrency level after the fix (+24 ms at c=1 to +341 ms at c=50),
+because the old blocking-call bug had accidentally serialized concurrent
+`/metrics` polling in a way that hid this scaling cost. Presented this
+finding and two options (rent more GPU time for a background-polling fix
++ re-run, or accept and disclose); you chose to accept and disclose.
+
+**Folded into the manuscript** as new Sections 4.11 (methodology) and 5.10
+(results, Table 10), plus updates to the revision header, contributions
+list (#9), Discussion, Limitations, Future Work, Conclusion, Data
+Availability, and new Appendix I — all following this paper's existing
+honest-disclosure pattern (Appendices F/G/H). Per your standing
+instruction, the title and abstract are **not** reframed around
+network-awareness: this extension is small-scale (5-query mock corpus, no
+correctness/faithfulness data, co-located edge+cloud on one GPU, only 2 of
+4 profiles exercised, unfitted controller calibration), and is reported as
+exactly that.
+
+**Still needed before this is genuinely ready:**
+- Mirror all of the above into the LaTeX build (`build_latex.py` →
+  `body_generated.tex`) and rebuild the PDF — not yet done this round.
+- Push this round's manuscript changes (paper_draft_v2.md, this file) from
+  your Mac; the code/results (commits `181ef3d`..`7cb9b7e`) are already
+  pushed.
+- Fix the per-request `/metrics`-polling scaling cost (periodic background
+  polling instead of one live fetch per request) and re-validate on the
+  same 36 cells before any larger edge-cloud sweep.
+- Tag a release and archive this round's code + both grids' raw data
+  (`results/validation_grid/`, `results/validation_grid_rerun2/`,
+  `results/edge_gateway_log.jsonl`) as a new Zenodo version — not yet
+  done, disclosed as such in the Data Availability statement.
+
+#2/#3/#4 remain deliberately not started per your no-extra-budget call.
