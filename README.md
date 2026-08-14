@@ -73,7 +73,7 @@ model's KV-cache.
 ## Quickstart
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/vllm-arabic-rag.git
+git clone https://github.com/Akramtaha98/vllm-arabic-rag.git
 cd vllm-arabic-rag
 
 python -m venv venv && source venv/bin/activate
@@ -237,8 +237,8 @@ paper once published. In the meantime:
 @misc{arabic-rag-optimizer,
   title  = {Semantic-Driven Context Pruning for Optimizing Arabic RAG Systems
             in Memory-Constrained vLLM Deployments},
-  author = {Your Name},
+  author = {Akram Taha},
   year   = {2026},
-  url    = {https://github.com/YOUR_USERNAME/vllm-arabic-rag}
+  url    = {https://github.com/Akramtaha98/vllm-arabic-rag}
 }
 ```

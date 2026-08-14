@@ -252,7 +252,6 @@ def build():
             needs_shrink = caption_latex is not None and (
                 "least time-confounded" in caption_latex
                 or "Human-rated correctness and faithfulness" in caption_latex
-                or "Mean TTFT (ms) by method, profile, and concurrency" in caption_latex
             )
             out.append(r"\scriptsize" if needs_shrink else r"\footnotesize")
             out.append(r"\setlength{\tabcolsep}{2pt}" if needs_shrink else r"\setlength{\tabcolsep}{3.5pt}")

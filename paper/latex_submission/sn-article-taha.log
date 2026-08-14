@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2026.6.9)  14 AUG 2026 09:31
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2026.6.9)  14 AUG 2026 13:08
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -607,18 +607,12 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [4]
-Underfull \hbox (badness 5652) in paragraph at lines 25--26
-[]\OT1/cmr/bx/n/10.03749 A pre-lim-i-nary edge-cloud exten-sion with two new ru
-le-based
- []
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [5]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [6]
@@ -628,19 +622,16 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [8]
-<Fig1.png, id=228, 759.3168pt x 235.3593pt>
+<Fig1.png, id=219, 759.3168pt x 235.3593pt>
 File: Fig1.png Graphic file (type png)
 <use Fig1.png>
-Package pdftex.def Info: Fig1.png  used on input line 60.
+Package pdftex.def Info: Fig1.png  used on input line 59.
 (pdftex.def)             Requested size: 316.20227pt x 98.00986pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [9]
-Underfull \hbox (badness 1496) in paragraph at lines 68--69
+ [9 <./Fig1.png>]
+Underfull \hbox (badness 1496) in paragraph at lines 67--68
 \OT1/cmr/m/n/10 Every sen-tence extracted from every retrieved pas-sage, across
  the full top-k
  []
@@ -648,27 +639,24 @@ Underfull \hbox (badness 1496) in paragraph at lines 68--69
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [10 <./Fig1.png>]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [11]
+ [10]
 LaTeX Font Info:    Trying to load font information for OMS+cmr on input line 9
-5.
+4.
 
 (/usr/share/texlive/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 2019/12/16 v2.5j Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/bx/n' in size <10.03749> not available
-(Font)              Font shape `OMS/cmsy/b/n' tried instead on input line 95.
+(Font)              Font shape `OMS/cmsy/b/n' tried instead on input line 94.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-
+ [11]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [12]
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.03749> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 105.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 104.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
@@ -676,10 +664,19 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [13]
-Underfull \hbox (badness 1895) in paragraph at lines 111--112
+Underfull \hbox (badness 1895) in paragraph at lines 110--111
 \OT1/cmr/m/n/10 line), \OT1/cmtt/m/n/10.03749 RAG[]MODE=lspm \OT1/cmr/m/n/10 (L
 SPM prun-ing at a spec-i-fied com-pres-sion ratio), and
  []
+
+
+Underfull \hbox (badness 1755) in paragraph at lines 110--111
+\OT1/cmr/m/n/10 end-point (\OT1/cmtt/m/n/10.03749 vllm:kv[]cache[]usage[]perc\O
+T1/cmr/m/n/10 ) at 1 Hz. Per-request time-to-first-token
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
@@ -690,101 +687,59 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
  [15]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
  [16]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
  [17]
-LaTeX Font Info:    Font shape `OT1/cmtt/bx/n' in size <10.03749> not available
-
-(Font)              Font shape `OT1/cmtt/m/n' tried instead on input line 144.
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [18]
-Underfull \hbox (badness 2057) in paragraph at lines 148--149
-\OT1/cmr/m/n/10 cur-rency lev-els (1, 10, 50 sim-u-lated users) $\OMS/cmsy/m/n/
-10.03749 ^^B$ \OT1/cmr/m/n/10 3 repeated 90-second Locust
- []
-
-
-Underfull \hbox (badness 1603) in paragraph at lines 150--151
-[]\OT1/cmr/bx/n/10.03749 The bug-fix-then-rerun his-tory is itself part of the 
-record, not
- []
-
-
-Underfull \hbox (badness 3803) in paragraph at lines 150--151
-\OT1/cmr/bx/n/10.03749 a foot-note. \OT1/cmr/m/n/10 The first full 90-cell run 
-com-pleted with zero request fail-
- []
-
-
-Underfull \hbox (badness 2359) in paragraph at lines 150--151
-\OT1/cmr/m/n/10 ures, but a sub-se-quent anal-y-sis of its own out-put (not a s
-ep-a-rate audit)
- []
-
-
-Underfull \hbox (badness 6708) in paragraph at lines 150--151
-\OT1/cmr/m/n/10 sur-faced three real imple-men-ta-tion defects, none of which a
-ffected \OT1/cmtt/m/n/10.03749 raw\OT1/cmr/m/n/10 ,
- []
-
-
-Underfull \hbox (badness 1824) in paragraph at lines 150--151
-\OT1/cmtt/m/n/10.03749 naive\OT1/cmr/m/n/10 , or \OT1/cmtt/m/n/10.03749 fixed[]
-lspm\OT1/cmr/m/n/10 : (1) \OT1/cmtt/m/n/10.03749 DynamicRatioController \OT1/cm
-r/m/n/10 matched only the met-
- []
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [19]
-<Fig2.png, id=282, 532.6299pt x 337.26pt>
+<Fig2.png, id=264, 532.6299pt x 337.26pt>
 File: Fig2.png Graphic file (type png)
 <use Fig2.png>
-Package pdftex.def Info: Fig2.png  used on input line 173.
+Package pdftex.def Info: Fig2.png  used on input line 159.
 (pdftex.def)             Requested size: 316.20227pt x 200.21675pt.
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [20 <./Fig2.png>]
-<Fig3.png, id=291, 893.9799pt x 364.9635pt>
+<Fig3.png, id=265, 893.9799pt x 364.9635pt>
 File: Fig3.png Graphic file (type png)
 <use Fig3.png>
-Package pdftex.def Info: Fig3.png  used on input line 198.
+Package pdftex.def Info: Fig3.png  used on input line 184.
 (pdftex.def)             Requested size: 316.20227pt x 129.0868pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [21 <./Fig3.png>]
-<Fig4.png, id=299, 929.874pt x 336.2964pt>
+ [18 <./Fig2.png>]
+Underfull \hbox (badness 1009) in paragraph at lines 191--192
+\OT1/cmr/bx/n/10.03749 trun-ca-tion at any tested ratio. \OT1/cmr/m/n/10 Mean d
+if-fer-ences are small in mag-ni-tude
+ []
+
+<Fig4.png, id=274, 929.874pt x 336.2964pt>
 File: Fig4.png Graphic file (type png)
 <use Fig4.png>
-Package pdftex.def Info: Fig4.png  used on input line 231.
+Package pdftex.def Info: Fig4.png  used on input line 217.
 (pdftex.def)             Requested size: 316.20227pt x 114.35979pt.
-<Fig5.png, id=300, 787.743pt x 327.74445pt>
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [19 <./Fig3.png>]
+<Fig5.png, id=283, 787.743pt x 327.74445pt>
 File: Fig5.png Graphic file (type png)
 <use Fig5.png>
-Package pdftex.def Info: Fig5.png  used on input line 262.
+Package pdftex.def Info: Fig5.png  used on input line 248.
 (pdftex.def)             Requested size: 316.20227pt x 131.56053pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [22 <./Fig4.png>]
+ [20 <./Fig4.png>]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [23 <./Fig5.png>]
+ [21 <./Fig5.png>]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [22]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [23]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [24]
@@ -793,33 +748,38 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
  [25]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [26]
+
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [27]
-<Fig6.png, id=341, 642.11896pt x 930.8376pt>
+ [26]
+<Fig6.png, id=330, 642.11896pt x 930.8376pt>
 File: Fig6.png Graphic file (type png)
 <use Fig6.png>
-Package pdftex.def Info: Fig6.png  used on input line 397.
+Package pdftex.def Info: Fig6.png  used on input line 384.
 (pdftex.def)             Requested size: 316.20227pt x 458.38696pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [28]
+
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [29 <./Fig6.png>]
-Underfull \hbox (badness 1584) in paragraph at lines 425--426
-\OT1/cmr/m/n/10 This sub-sec-tion reports the 90-cell grid described in Section
- 4.11: the fully
+ [27]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [28 <./Fig6.png>]
+Underfull \hbox (badness 1077) in paragraph at lines 414--415
+[]\OT1/cmr/bx/n/10.03749 The blind human eval-u-a-tion (5.9) speaks directly to
+ a gap the
  []
 
 
-Underfull \hbox (badness 2547) in paragraph at lines 425--426
-\OT1/cmr/m/n/10 cor-rected \OT1/cmtt/m/n/10.03749 kv[]aware\OT1/cmr/m/n/10 /\OT
-1/cmtt/m/n/10.03749 network[]aware \OT1/cmr/m/n/10 re-run (36 cells) along-side
- the unaf-fected
- []
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [29]
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
@@ -828,21 +788,15 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [31]
-Underfull \hbox (badness 10000) in paragraph at lines 456--457
-[]\OT1/cmr/bx/n/10.03749 A KV-cache-occupancy and through-put com-par-i-son acr
-oss
- []
-
-
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [32]
-Underfull \hbox (badness 1077) in paragraph at lines 461--462
-[]\OT1/cmr/bx/n/10.03749 The blind human eval-u-a-tion (5.9) speaks directly to
- a gap the
+Underfull \hbox (badness 1137) in paragraph at lines 441--442
+[]\OT1/cmr/bx/n/10.03749 Automatic met-rics as fidelity prox-ies -- now par-tia
+lly, not fully,
  []
 
 
@@ -854,14 +808,27 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
  [33]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
+ [34]
+Underfull \hbox (badness 10000) in paragraph at lines 452--453
+[]\OT1/cmr/bx/n/10.03749 A network-aware, edge-cloud exten-sion of LSPM (a rule
+-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 452--453
+\OT1/cmr/bx/n/10.03749 based con-troller that cou-ples the com-pres-sion ratio 
+to live
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 452--453
+\OT1/cmr/m/n/10 (\OT1/cmtt/m/n/10.03749 benchmark/edge[]gateway.py\OT1/cmr/m/n/
+10 , \OT1/cmtt/m/n/10.03749 network[]profiles.py\OT1/cmr/m/n/10 , \OT1/cmtt/m/n
+/10.03749 network[]controller.py\OT1/cmr/m/n/10 ,
+ []
+
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [34]
-Underfull \hbox (badness 2343) in paragraph at lines 471--472
-[]\OT1/cmr/bx/n/10.03749 The pre-lim-i-nary edge-cloud exten-sion (4.11/5.10) i
-s a systems-
- []
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
@@ -873,18 +840,96 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [36]
-Underfull \hbox (badness 1137) in paragraph at lines 488--489
-[]\OT1/cmr/bx/n/10.03749 Automatic met-rics as fidelity prox-ies -- now par-tia
-lly, not fully,
- []
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [37]
+Underfull \hbox (badness 1215) in paragraph at lines 462--463
+\OT1/cmr/bx/n/10.03749 Data avail-abil-ity. \OT1/cmr/m/n/10 The com-plete sourc
+e code (LSPM mid-dle-ware, eval-u-a-tion
+ []
+
+
+Underfull \hbox (badness 2478) in paragraph at lines 462--463
+\OT1/cmr/m/n/10 scripts, sta-tis-ti-cal anal-y-sis scripts, bench-mark-ing har-
+ness, and demon-stra-tion
+ []
+
+
+Underfull \hbox (badness 1466) in paragraph at lines 462--463
+\OT1/cmr/m/n/10 inter-face) is pub-licly avail-able at https://github.com/Akram
+taha98/vllm-arabic-
+ []
+
+
+Underfull \hbox (badness 5970) in paragraph at lines 462--463
+\OT1/cmr/m/n/10 fidelity and base-line pilot dataset (all 48 ratio$\OMS/cmsy/m/
+n/10.03749 ^^B$\OT1/cmr/m/n/10 method cells across its
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 462--463
+\OT1/cmr/m/n/10 single- and multi-ratio phases), the ARCD ground-truth re-test 
+dataset
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 462--463
+\OT1/cmr/m/n/10 and code (\OT1/cmtt/m/n/10.03749 build[]arcd[]eval[]set.py\OT1/
+cmr/m/n/10 , \OT1/cmtt/m/n/10.03749 arabic[]em[]f1.py\OT1/cmr/m/n/10 , \OT1/cmt
+t/m/n/10.03749 run[]arcd[]pilot.py\OT1/cmr/m/n/10 ,
+ []
+
+
+Underfull \hbox (badness 2600) in paragraph at lines 462--463
+\OT1/cmtt/m/n/10.03749 analyze[]arcd[]results.py\OT1/cmr/m/n/10 , and the full 
+980-row \OT1/cmtt/m/n/10.03749 arcd[]results.jsonl \OT1/cmr/m/n/10 out-put
+ []
+
+
+Underfull \hbox (badness 1009) in paragraph at lines 462--463
+\OT1/cmr/m/n/10 This is dis-closed here rather than implied to be com-plete, an
+d clos-ing it is
+ []
+
+
+Underfull \hbox (badness 1924) in paragraph at lines 462--463
+\OT1/cmr/m/n/10 (\OT1/cmtt/m/n/10.03749 scripts/build[]human[]eval[]sample.py\O
+T1/cmr/m/n/10 , \OT1/cmtt/m/n/10.03749 scripts/merge[]human[]eval[]ratings.py\O
+T1/cmr/m/n/10 ,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 462--463
+\OT1/cmtt/m/n/10.03749 scripts/analyze[]human[]eval.py\OT1/cmr/m/n/10 ) are in 
+the repos-i-tory. An ear-lier
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 462--463
+\OT1/cmr/m/n/10 ver-sion of this state-ment claimed the com-pleted blind rat-in
+g sheet
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 462--463
+\OT1/cmr/m/n/10 (\OT1/cmtt/m/n/10.03749 data/human[]eval[]sample[]blind.csv\OT1
+/cmr/m/n/10 ), the pri-vate item-to-method code-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 462--463
+\OT1/cmr/m/n/10 book (\OT1/cmtt/m/n/10.03749 data/human[]eval[]codebook.json\OT
+1/cmr/m/n/10 ), and the sum-mary statis-tics
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 462--463
+\OT1/cmr/m/n/10 (\OT1/cmtt/m/n/10.03749 benchmark/edge[]gateway.py\OT1/cmr/m/n/
+10 , \OT1/cmtt/m/n/10.03749 network[]profiles.py\OT1/cmr/m/n/10 , \OT1/cmtt/m/n
+/10.03749 network[]controller.py\OT1/cmr/m/n/10 ,
+ []
+
+
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [38]
@@ -896,102 +941,13 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
  [39]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
  [40]
-Underfull \hbox (badness 1215) in paragraph at lines 509--510
-\OT1/cmr/bx/n/10.03749 Data avail-abil-ity. \OT1/cmr/m/n/10 The com-plete sourc
-e code (LSPM mid-dle-ware, eval-u-a-tion
- []
-
-
-Underfull \hbox (badness 2478) in paragraph at lines 509--510
-\OT1/cmr/m/n/10 scripts, sta-tis-ti-cal anal-y-sis scripts, bench-mark-ing har-
-ness, and demon-stra-tion
- []
-
-
-Underfull \hbox (badness 1466) in paragraph at lines 509--510
-\OT1/cmr/m/n/10 inter-face) is pub-licly avail-able at https://github.com/Akram
-taha98/vllm-arabic-
- []
-
-
-Underfull \hbox (badness 5970) in paragraph at lines 509--510
-\OT1/cmr/m/n/10 fidelity and base-line pilot dataset (all 48 ratio$\OMS/cmsy/m/
-n/10.03749 ^^B$\OT1/cmr/m/n/10 method cells across its
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 509--510
-\OT1/cmr/m/n/10 single- and multi-ratio phases), the ARCD ground-truth re-test 
-dataset
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 509--510
-\OT1/cmr/m/n/10 and code (\OT1/cmtt/m/n/10.03749 build[]arcd[]eval[]set.py\OT1/
-cmr/m/n/10 , \OT1/cmtt/m/n/10.03749 arabic[]em[]f1.py\OT1/cmr/m/n/10 , \OT1/cmt
-t/m/n/10.03749 run[]arcd[]pilot.py\OT1/cmr/m/n/10 ,
- []
-
-
-Underfull \hbox (badness 2600) in paragraph at lines 509--510
-\OT1/cmtt/m/n/10.03749 analyze[]arcd[]results.py\OT1/cmr/m/n/10 , and the full 
-980-row \OT1/cmtt/m/n/10.03749 arcd[]results.jsonl \OT1/cmr/m/n/10 out-put
- []
-
-
-Underfull \hbox (badness 1430) in paragraph at lines 509--510
-\OT1/cmr/m/n/10 sheet with both raters' scores (\OT1/cmtt/m/n/10.03749 data/hum
-an[]eval[]sample[]blind.csv\OT1/cmr/m/n/10 ), and the
- []
-
-
-Underfull \hbox (badness 1199) in paragraph at lines 509--510
-\OT1/cmr/m/n/10 ing was com-plete, is released along-side them. The repos-i-tor
-y state described
- []
-
-
-Underfull \hbox (badness 3460) in paragraph at lines 509--510
-\OT1/cmr/m/n/10 above is tagged release \OT1/cmtt/m/n/10.03749 v1.0-submission\
-OT1/cmr/m/n/10 , archived with DOI [][]10.5281/zen-
- []
-
-
-Underfull \hbox (badness 1014) in paragraph at lines 509--510
-\OT1/cmr/m/n/10 odo.21826992[][] [43]; a version-specific DOI update fol-low-in
-g the v2 re-run and
- []
-
-
-Underfull \hbox (badness 1308) in paragraph at lines 509--510
-\OT1/cmr/m/n/10 a cor-re-spond-ing new Zen-odo ver-sion is antic-i-pated before
- this manuscript is
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 509--510
-\OT1/cmtt/m/n/10.03749 benchmark/network[]profiles.py\OT1/cmr/m/n/10 , \OT1/cmt
-t/m/n/10.03749 benchmark/network[]controller.py\OT1/cmr/m/n/10 ,
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 509--510
-\OT1/cmtt/m/n/10.03749 benchmark/locustfile[]edge.py\OT1/cmr/m/n/10 , \OT1/cmtt
-/m/n/10.03749 benchmark/run[]validation[]grid.py\OT1/cmr/m/n/10 ,
- []
-
-
-Underfull \hbox (badness 1127) in paragraph at lines 509--510
-\OT1/cmtt/m/n/10.03749 3972447\OT1/cmr/m/n/10 , con-tain-ing the still-valid \O
-T1/cmtt/m/n/10.03749 raw\OT1/cmr/m/n/10 /\OT1/cmtt/m/n/10.03749 naive\OT1/cmr/m
-/n/10 /\OT1/cmtt/m/n/10.03749 fixed[]lspm \OT1/cmr/m/n/10 cells and the since-
- []
-
-
-Underfull \hbox (badness 2096) in paragraph at lines 509--510
-\OT1/cmr/m/n/10 and the cor-rected 36-cell re-run (\OT1/cmtt/m/n/10.03749 resul
-ts/validation[]grid[]rerun2/\OT1/cmr/m/n/10 , com-mit
+Underfull \hbox (badness 1783) in paragraph at lines 527--528
+[]\OT1/cmr/m/n/10 N. Sen-gupta et al., "Jais and Jais-chat: Arabic-Centric Foun
+-da-tion and
  []
 
 
@@ -1001,31 +957,7 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [41]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [42]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [43]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [44]
-Underfull \hbox (badness 1783) in paragraph at lines 574--575
-[]\OT1/cmr/m/n/10 N. Sen-gupta et al., "Jais and Jais-chat: Arabic-Centric Foun
--da-tion and
- []
-
-
-Underfull \hbox (badness 1308) in paragraph at lines 576--577
+Underfull \hbox (badness 1308) in paragraph at lines 529--530
 []\OT1/cmr/m/n/10 A. Huang et al., "ACVA: Ara-bic Cul-tural and Value Align-men
 t Bench-
  []
@@ -1036,61 +968,56 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [45]
-Underfull \hbox (badness 1082) in paragraph at lines 602--603
+ [42]
+Underfull \hbox (badness 1082) in paragraph at lines 555--556
 []\OT1/cmr/m/n/10 J. Chen, S. Xiao, P. Zhang, K. Luo, D. Lian, and Z. Liu, "BGE
  M3-
  []
 
-
+)
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [46])
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [47]
+ [43]
 (./sn-article-taha.aux)
 Package rerunfilecheck Info: File `sn-article-taha.out' has not changed.
-(rerunfilecheck)             Checksum: 70152BA7A5FB92296E7E34A00362F94E;10160.
+(rerunfilecheck)             Checksum: DC687E72CF03E45761155421E8E3E782;9360.
  ) 
 Here is how much of TeX's memory you used:
- 11991 strings out of 480247
- 185882 string characters out of 5896152
- 479594 words of memory out of 5000000
- 29562 multiletter control sequences out of 15000+600000
- 498821 words of font info for 141 fonts, out of 8000000 for 9000
+ 11980 strings out of 480247
+ 185756 string characters out of 5896152
+ 477328 words of memory out of 5000000
+ 29558 multiletter control sequences out of 15000+600000
+ 498990 words of font info for 141 fonts, out of 8000000 for 9000
  24 hyphenation exceptions out of 8191
- 85i,11n,90p,4688b,619s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 85i,11n,90p,3843b,605s stack positions out of 5000i,500n,10000p,200000b,80000s
  </sessions/practical-clever-mccarthy/.texlive2021/texmf-var/fonts/pk/ljfour/
-jknappen/ec/tcbx1000.602pk> </sessions/practical-clever-mccarthy/.texlive2021/t
-exmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.602pk></usr/share/texlive/texmf-d
-ist/fonts/type1/public/amsfonts/cm/cmbsy10.pfb></usr/share/texlive/texmf-dist/f
-onts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/texlive/texmf-dist/fonts/t
-ype1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texmf-dist/fonts/type1/p
-ublic/amsfonts/cm/cmbx7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/a
-msfonts/cm/cmbx8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts
-/cm/cmbx9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmm
-i10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb
-></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/
-share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/share
-/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/share/texliv
-e/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf
--dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/f
-onts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/typ
-e1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/publi
-c/amsfonts/cm/cmr9.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfon
-ts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/
-cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.p
-fb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></u
-sr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/sha
-re/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt8.pfb>
-Output written on sn-article-taha.pdf (47 pages, 1415803 bytes).
+jknappen/ec/tcrm0800.602pk> </sessions/practical-clever-mccarthy/.texlive2021/t
+exmf-var/fonts/pk/ljfour/jknappen/ec/tcbx1000.602pk> </sessions/practical-cleve
+r-mccarthy/.texlive2021/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1000.602pk></
+usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbsy10.pfb></usr/s
+hare/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/t
+exlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx7.pfb></usr/share/texlive/texmf-
+dist/fonts/type1/public/amsfonts/cm/cmbx8.pfb></usr/share/texlive/texmf-dist/fo
+nts/type1/public/amsfonts/cm/cmbx9.pfb></usr/share/texlive/texmf-dist/fonts/typ
+e1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist/fonts/type1/pub
+lic/amsfonts/cm/cmmi7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/ams
+fonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/c
+m/cmmib10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr
+10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb>
+</usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/s
+hare/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/share/tex
+live/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/tex
+mf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/share/texlive/texmf-dist/
+fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/
+type1/public/amsfonts/cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/p
+ublic/amsfonts/cm/cmsy8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/a
+msfonts/cm/cmti10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfont
+s/cm/cmtt10.pfb>
+Output written on sn-article-taha.pdf (43 pages, 1394718 bytes).
 PDF statistics:
- 663 PDF objects out of 1000 (max. 8388607)
- 549 compressed objects within 6 object streams
- 160 named destinations out of 1000 (max. 500000)
- 359 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 636 PDF objects out of 1000 (max. 8388607)
+ 527 compressed objects within 6 object streams
+ 153 named destinations out of 1000 (max. 500000)
+ 343 words of extra memory for PDF output out of 10000 (max. 10000000)
 
