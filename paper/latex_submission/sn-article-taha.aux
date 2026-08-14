@@ -20,75 +20,79 @@
 \Newlabel{1}{1}
 \Newlabel{2}{2}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{2}{section.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {2}Related Work}{5}{section.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Retrieval-Augmented Generation}{5}{subsection.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2}Related Work}{6}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Retrieval-Augmented Generation}{6}{subsection.2.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Prompt and Context Compression}{6}{subsection.2.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Passage Reranking and Sentence-Level Relevance Scoring}{7}{subsection.2.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Arabic Natural Language Processing}{7}{subsection.2.4}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Memory-Efficient LLM Serving}{8}{subsection.2.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.6}Automatic Evaluation of Generated Text and Statistical Methodology}{8}{subsection.2.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.6}Automatic Evaluation of Generated Text and Statistical Methodology}{9}{subsection.2.6}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {3}System Design: The Lightweight Semantic Pruning Middleware (LSPM)}{9}{section.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Overview}{9}{subsection.3.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces five-stage pipeline diagram: User Query $\rightarrow $ Vector DB (Chroma) $\rightarrow $ LSPM Middleware $\rightarrow $ vLLM Server (PagedAttention) $\rightarrow $ Streamed Answer, with the LSPM stage annotated "sentence-level cross-encoder scoring + fixed/dynamic compression ratio"}}{9}{figure.1}\protected@file@percent }
-\newlabel{fig:1}{{1}{9}{five-stage pipeline diagram: User Query $\rightarrow $ Vector DB (Chroma) $\rightarrow $ LSPM Middleware $\rightarrow $ vLLM Server (PagedAttention) $\rightarrow $ Streamed Answer, with the LSPM stage annotated "sentence-level cross-encoder scoring + fixed/dynamic compression ratio"}{figure.1}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Sentence Segmentation}{9}{subsection.3.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces five-stage pipeline diagram: User Query $\rightarrow $ Vector DB (Chroma) $\rightarrow $ LSPM Middleware $\rightarrow $ vLLM Server (PagedAttention) $\rightarrow $ Streamed Answer, with the LSPM stage annotated "sentence-level cross-encoder scoring + fixed/dynamic compression ratio"}}{10}{figure.1}\protected@file@percent }
+\newlabel{fig:1}{{1}{10}{five-stage pipeline diagram: User Query $\rightarrow $ Vector DB (Chroma) $\rightarrow $ LSPM Middleware $\rightarrow $ vLLM Server (PagedAttention) $\rightarrow $ Streamed Answer, with the LSPM stage annotated "sentence-level cross-encoder scoring + fixed/dynamic compression ratio"}{figure.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Sentence Segmentation}{10}{subsection.3.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Cross-Encoder Relevance Scoring}{10}{subsection.3.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Order-Preserving Reconstruction and Compression Ratio}{10}{subsection.3.4}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.5}Backend Interface and Deployment Flexibility}{11}{subsection.3.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {4}Experimental Setup}{11}{section.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Tokenization Disparity Measurement}{11}{subsection.4.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Semantic Fidelity Pilot: Ratio Sweep}{11}{subsection.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Tokenization Disparity Measurement}{12}{subsection.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Semantic Fidelity Pilot: Ratio Sweep}{12}{subsection.4.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Baseline Comparison: LSPM vs. Naive Length-Matched Truncation}{12}{subsection.4.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Ground-Truth Baseline Re-Test on ARCD (n = 140)}{12}{subsection.4.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Analytical KV-Cache Savings Estimate}{13}{subsection.4.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Ground-Truth Baseline Re-Test on ARCD (n = 140)}{13}{subsection.4.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Analytical KV-Cache Savings Estimate}{14}{subsection.4.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.6}Throughput and KV-Cache Benchmark: Protocol and Execution}{14}{subsection.4.6}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.7}LSPM Overhead Measurement}{15}{subsection.4.7}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.8}Disclosure of AI Assistance}{15}{subsection.4.8}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.9}End-to-End Retrieval Check (No Recall Guarantee)}{16}{subsection.4.9}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.10}Human Evaluation Methodology}{16}{subsection.4.10}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5}Results}{17}{section.5}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Tokenization Disparity (Now with Significance Testing)}{17}{subsection.5.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Semantic Fidelity Across a Ratio Sweep}{17}{subsection.5.2}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Arabic/English token-count ratio across two tokenizers (n = 30 parallel sentence pairs)}}{18}{table.1}\protected@file@percent }
-\newlabel{tab:1}{{1}{18}{Arabic/English token-count ratio across two tokenizers (n = 30 parallel sentence pairs)}{table.1}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces box plot of per-pair Arabic/English token-count ratio distributions for both tokenizers, with a dashed parity line at 1.0}}{18}{figure.2}\protected@file@percent }
-\newlabel{fig:2}{{2}{18}{box plot of per-pair Arabic/English token-count ratio distributions for both tokenizers, with a dashed parity line at 1.0}{figure.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces LSPM fidelity vs. raw-context answers across compression ratios (n = 8 real QA items per ratio, live Llama-3.1-8B-Instruct endpoint, 95\% bootstrap CI)}}{18}{table.2}\protected@file@percent }
-\newlabel{tab:2}{{2}{18}{LSPM fidelity vs. raw-context answers across compression ratios (n = 8 real QA items per ratio, live Llama-3.1-8B-Instruct endpoint, 95\% bootstrap CI)}{table.2}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces three-panel plot (ROUGE-L, BERTScore-F1, BLEU) of LSPM vs. naive truncation fidelity across ratios, with error bars showing 95\% bootstrap CI}}{19}{figure.3}\protected@file@percent }
-\newlabel{fig:3}{{3}{19}{three-panel plot (ROUGE-L, BERTScore-F1, BLEU) of LSPM vs. naive truncation fidelity across ratios, with error bars showing 95\% bootstrap CI}{figure.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Baseline Comparison: Does Semantic Scoring Beat Naive Truncation?}{19}{subsection.5.3}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Paired comparison, LSPM vs. naive truncation (n = 8 paired questions per ratio, 10,000-resample bootstrap)}}{19}{table.3}\protected@file@percent }
-\newlabel{tab:3}{{3}{19}{Paired comparison, LSPM vs. naive truncation (n = 8 paired questions per ratio, 10,000-resample bootstrap)}{table.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces bar chart of mean paired differences per ratio and metric, with bootstrap p-values annotated; all non-significant at $\alpha $ = 0.05}}{20}{figure.4}\protected@file@percent }
-\newlabel{fig:4}{{4}{20}{bar chart of mean paired differences per ratio and metric, with bootstrap p-values annotated; all non-significant at $\alpha $ = 0.05}{figure.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Ground-Truth Baseline Re-Test on ARCD (n = 140)}{20}{subsection.5.4}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces ARCD ground-truth accuracy (n = 140 questions, six-document noisy retrieval pool, 95\% bootstrap CI)}}{20}{table.4}\protected@file@percent }
-\newlabel{tab:4}{{4}{20}{ARCD ground-truth accuracy (n = 140 questions, six-document noisy retrieval pool, 95\% bootstrap CI)}{table.4}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces two-panel plot (Exact Match, token-F1) vs. compression ratio for LSPM and naive truncation, raw/unpruned shown as a reference line, error bars showing 95\% bootstrap CI}}{20}{figure.5}\protected@file@percent }
-\newlabel{fig:5}{{5}{20}{two-panel plot (Exact Match, token-F1) vs. compression ratio for LSPM and naive truncation, raw/unpruned shown as a reference line, error bars showing 95\% bootstrap CI}{figure.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Analytical KV-Cache Savings Projection (Not a Measured Result)}{21}{subsection.5.5}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces ARCD pairwise F1 comparisons with Holm-Bonferroni correction across the nine-test family (n = 140, Wilcoxon signed-rank)}}{22}{table.5}\protected@file@percent }
-\newlabel{tab:5}{{5}{22}{ARCD pairwise F1 comparisons with Holm-Bonferroni correction across the nine-test family (n = 140, Wilcoxon signed-rank)}{table.5}{}}
-\newlabel{tab:6}{{5.4}{22}{Ground-Truth Baseline Re-Test on ARCD (n = 140)}{table.5}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Analytical (not measured) KV-cache savings projection, derived from real architecture config and real measured context reduction}}{22}{table.6}\protected@file@percent }
-\newlabel{tab:7}{{6}{22}{Analytical (not measured) KV-cache savings projection, derived from real architecture config and real measured context reduction}{table.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.6}LSPM Overhead}{23}{subsection.5.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.7}End-to-End Retrieval Results (No Recall Guarantee)}{23}{subsection.5.7}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces End-to-end retrieval check: mean EM/F1 by method and retrieval outcome (r = 0.3, 95\% bootstrap CI where n permits)}}{23}{table.7}\protected@file@percent }
-\newlabel{tab:8}{{7}{23}{End-to-end retrieval check: mean EM/F1 by method and retrieval outcome (r = 0.3, 95\% bootstrap CI where n permits)}{table.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.8}Measured GPU Benchmark Results}{24}{subsection.5.8}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces Measured throughput, TTFT, and KV-cache occupancy at c = 1, the single least time-confounded cell (raw vs. LSPM, all three ratios). Reported as an exploratory, single-concurrency observation, not a validated claim; see below for why c = 10 is not included here}}{25}{table.8}\protected@file@percent }
-\newlabel{tab:9}{{8}{25}{Measured throughput, TTFT, and KV-cache occupancy at c = 1, the single least time-confounded cell (raw vs. LSPM, all three ratios). Reported as an exploratory, single-concurrency observation, not a validated claim; see below for why c = 10 is not included here}{table.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.9}Human Evaluation Results}{26}{subsection.5.9}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces Human-rated correctness and faithfulness by method (n = 30 items per method, two raters averaged per item, 95\% bootstrap CI)}}{26}{table.9}\protected@file@percent }
-\newlabel{tab:10}{{9}{26}{Human-rated correctness and faithfulness by method (n = 30 items per method, two raters averaged per item, 95\% bootstrap CI)}{table.9}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces three panels (throughput, TTFT, KV-cache occupancy) vs. concurrency, one line per method/ratio, from the measured 35-cell sweep. Read alongside the c = 1-only claim above: the plotted curves make visually clear that the raw/LSPM/naive lines separate and reorder as concurrency increases, which is precisely the pattern this section reports as unresolved rather than confirmed}}{27}{figure.6}\protected@file@percent }
-\newlabel{fig:6}{{6}{27}{three panels (throughput, TTFT, KV-cache occupancy) vs. concurrency, one line per method/ratio, from the measured 35-cell sweep. Read alongside the c = 1-only claim above: the plotted curves make visually clear that the raw/LSPM/naive lines separate and reorder as concurrency increases, which is precisely the pattern this section reports as unresolved rather than confirmed}{figure.6}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {6}Discussion}{28}{section.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {7}Limitations and Threats to Validity}{30}{section.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {8}Future Work}{32}{section.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {9}Conclusion}{34}{section.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.10}Human Evaluation Methodology}{17}{subsection.4.10}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.11}A Preliminary Edge-Cloud, Network-Aware Extension: Small Validation Grid Methodology}{18}{subsection.4.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Results}{20}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Tokenization Disparity (Now with Significance Testing)}{20}{subsection.5.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Arabic/English token-count ratio across two tokenizers (n = 30 parallel sentence pairs)}}{20}{table.1}\protected@file@percent }
+\newlabel{tab:1}{{1}{20}{Arabic/English token-count ratio across two tokenizers (n = 30 parallel sentence pairs)}{table.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces box plot of per-pair Arabic/English token-count ratio distributions for both tokenizers, with a dashed parity line at 1.0}}{20}{figure.2}\protected@file@percent }
+\newlabel{fig:2}{{2}{20}{box plot of per-pair Arabic/English token-count ratio distributions for both tokenizers, with a dashed parity line at 1.0}{figure.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Semantic Fidelity Across a Ratio Sweep}{21}{subsection.5.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces LSPM fidelity vs. raw-context answers across compression ratios (n = 8 real QA items per ratio, live Llama-3.1-8B-Instruct endpoint, 95\% bootstrap CI)}}{21}{table.2}\protected@file@percent }
+\newlabel{tab:2}{{2}{21}{LSPM fidelity vs. raw-context answers across compression ratios (n = 8 real QA items per ratio, live Llama-3.1-8B-Instruct endpoint, 95\% bootstrap CI)}{table.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces three-panel plot (ROUGE-L, BERTScore-F1, BLEU) of LSPM vs. naive truncation fidelity across ratios, with error bars showing 95\% bootstrap CI}}{21}{figure.3}\protected@file@percent }
+\newlabel{fig:3}{{3}{21}{three-panel plot (ROUGE-L, BERTScore-F1, BLEU) of LSPM vs. naive truncation fidelity across ratios, with error bars showing 95\% bootstrap CI}{figure.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Baseline Comparison: Does Semantic Scoring Beat Naive Truncation?}{21}{subsection.5.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Paired comparison, LSPM vs. naive truncation (n = 8 paired questions per ratio, 10,000-resample bootstrap)}}{22}{table.3}\protected@file@percent }
+\newlabel{tab:3}{{3}{22}{Paired comparison, LSPM vs. naive truncation (n = 8 paired questions per ratio, 10,000-resample bootstrap)}{table.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces bar chart of mean paired differences per ratio and metric, with bootstrap p-values annotated; all non-significant at $\alpha $ = 0.05}}{22}{figure.4}\protected@file@percent }
+\newlabel{fig:4}{{4}{22}{bar chart of mean paired differences per ratio and metric, with bootstrap p-values annotated; all non-significant at $\alpha $ = 0.05}{figure.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Ground-Truth Baseline Re-Test on ARCD (n = 140)}{22}{subsection.5.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces ARCD ground-truth accuracy (n = 140 questions, six-document noisy retrieval pool, 95\% bootstrap CI)}}{23}{table.4}\protected@file@percent }
+\newlabel{tab:4}{{4}{23}{ARCD ground-truth accuracy (n = 140 questions, six-document noisy retrieval pool, 95\% bootstrap CI)}{table.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces two-panel plot (Exact Match, token-F1) vs. compression ratio for LSPM and naive truncation, raw/unpruned shown as a reference line, error bars showing 95\% bootstrap CI}}{23}{figure.5}\protected@file@percent }
+\newlabel{fig:5}{{5}{23}{two-panel plot (Exact Match, token-F1) vs. compression ratio for LSPM and naive truncation, raw/unpruned shown as a reference line, error bars showing 95\% bootstrap CI}{figure.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces ARCD pairwise F1 comparisons with Holm-Bonferroni correction across the nine-test family (n = 140, Wilcoxon signed-rank)}}{24}{table.5}\protected@file@percent }
+\newlabel{tab:5}{{5}{24}{ARCD pairwise F1 comparisons with Holm-Bonferroni correction across the nine-test family (n = 140, Wilcoxon signed-rank)}{table.5}{}}
+\newlabel{tab:6}{{5.4}{24}{Ground-Truth Baseline Re-Test on ARCD (n = 140)}{table.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.5}Analytical KV-Cache Savings Projection (Not a Measured Result)}{25}{subsection.5.5}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {6}{\ignorespaces Analytical (not measured) KV-cache savings projection, derived from real architecture config and real measured context reduction}}{25}{table.6}\protected@file@percent }
+\newlabel{tab:7}{{6}{25}{Analytical (not measured) KV-cache savings projection, derived from real architecture config and real measured context reduction}{table.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.6}LSPM Overhead}{25}{subsection.5.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.7}End-to-End Retrieval Results (No Recall Guarantee)}{25}{subsection.5.7}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces End-to-end retrieval check: mean EM/F1 by method and retrieval outcome (r = 0.3, 95\% bootstrap CI where n permits)}}{26}{table.7}\protected@file@percent }
+\newlabel{tab:8}{{7}{26}{End-to-end retrieval check: mean EM/F1 by method and retrieval outcome (r = 0.3, 95\% bootstrap CI where n permits)}{table.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.8}Measured GPU Benchmark Results}{26}{subsection.5.8}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {8}{\ignorespaces Measured throughput, TTFT, and KV-cache occupancy at c = 1, the single least time-confounded cell (raw vs. LSPM, all three ratios). Reported as an exploratory, single-concurrency observation, not a validated claim; see below for why c = 10 is not included here}}{27}{table.8}\protected@file@percent }
+\newlabel{tab:9}{{8}{27}{Measured throughput, TTFT, and KV-cache occupancy at c = 1, the single least time-confounded cell (raw vs. LSPM, all three ratios). Reported as an exploratory, single-concurrency observation, not a validated claim; see below for why c = 10 is not included here}{table.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.9}Human Evaluation Results}{28}{subsection.5.9}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces three panels (throughput, TTFT, KV-cache occupancy) vs. concurrency, one line per method/ratio, from the measured 35-cell sweep. Read alongside the c = 1-only claim above: the plotted curves make visually clear that the raw/LSPM/naive lines separate and reorder as concurrency increases, which is precisely the pattern this section reports as unresolved rather than confirmed}}{29}{figure.6}\protected@file@percent }
+\newlabel{fig:6}{{6}{29}{three panels (throughput, TTFT, KV-cache occupancy) vs. concurrency, one line per method/ratio, from the measured 35-cell sweep. Read alongside the c = 1-only claim above: the plotted curves make visually clear that the raw/LSPM/naive lines separate and reorder as concurrency increases, which is precisely the pattern this section reports as unresolved rather than confirmed}{figure.6}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {9}{\ignorespaces Human-rated correctness and faithfulness by method (n = 30 items per method, two raters averaged per item, 95\% bootstrap CI)}}{30}{table.9}\protected@file@percent }
+\newlabel{tab:10}{{9}{30}{Human-rated correctness and faithfulness by method (n = 30 items per method, two raters averaged per item, 95\% bootstrap CI)}{table.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.10}Edge-Cloud Small Validation Grid: Preliminary Results}{30}{subsection.5.10}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {10}{\ignorespaces Mean TTFT (ms) by method, profile, and concurrency (3-repeat mean per cell). C = concurrency; \texttt  {constr\_wireless} = \texttt  {constrained\_wireless}; \texttt  {lspm} = \texttt  {fixed\_lspm}; \texttt  {kv}/\texttt  {net} = \texttt  {kv\_aware}/\texttt  {network\_aware}; \texttt  {(pre)}/\texttt  {(post)} = before/after the Section 4.11 bug fix}}{31}{table.10}\protected@file@percent }
+\newlabel{tab:11}{{10}{31}{Mean TTFT (ms) by method, profile, and concurrency (3-repeat mean per cell). C = concurrency; \texttt {constr\_wireless} = \texttt {constrained\_wireless}; \texttt {lspm} = \texttt {fixed\_lspm}; \texttt {kv}/\texttt {net} = \texttt {kv\_aware}/\texttt {network\_aware}; \texttt {(pre)}/\texttt {(post)} = before/after the Section 4.11 bug fix}{table.10}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Discussion}{32}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}Limitations and Threats to Validity}{35}{section.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {8}Future Work}{38}{section.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {9}Conclusion}{40}{section.9}\protected@file@percent }
 \bibcite{ref1}{{1}{}{{}}{{}}}
 \bibcite{ref2}{{2}{}{{}}{{}}}
 \bibcite{ref3}{{3}{}{{}}{{}}}
@@ -133,4 +137,4 @@
 \bibcite{ref42}{{42}{}{{}}{{}}}
 \bibcite{ref43}{{43}{}{{}}{{}}}
 \providecommand\NAT@force@numbers{}\NAT@force@numbers
-\gdef \@abspage@last{40}
+\gdef \@abspage@last{47}

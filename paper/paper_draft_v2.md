@@ -385,16 +385,16 @@ This subsection reports the 90-cell grid described in Section 4.11: the fully co
 
 **TTFT for the two adaptive controllers is substantially higher than for the three non-adaptive methods, and the fix changed, but did not remove, this gap.** Table 10 reports mean TTFT (ms) per method, profile, and concurrency level (mean of each cell's Locust-reported average TTFT across 3 repeats).
 
-**Table 10. Mean TTFT (ms) by method, profile, and concurrency (3-repeat mean per cell; `kv_aware`/`network_aware` "before" = original buggy run, "after" = corrected re-run).**
+**Table 10. Mean TTFT (ms) by method, profile, and concurrency (3-repeat mean per cell). C = concurrency; `constr_wireless` = `constrained_wireless`; `lspm` = `fixed_lspm`; `kv`/`net` = `kv_aware`/`network_aware`; `(pre)`/`(post)` = before/after the Section 4.11 bug fix.**
 
-| Profile | Concurrency | raw | naive | fixed_lspm | kv_aware (before) | kv_aware (after) | network_aware (before) | network_aware (after) |
+| Profile | C | raw | naive | lspm | kv (pre) | kv (post) | net (pre) | net (post) |
 |---|---|---|---|---|---|---|---|---|
 | edge_lan | 1 | 34 | 33 | 33 | 33 | 57 | 32 | 56 |
 | edge_lan | 10 | 59 | 61 | 63 | 77 | 107 | 72 | 113 |
 | edge_lan | 50 | 78 | 74 | 125 | 562 | 543 | 374 | 715 |
-| constrained_wireless | 1 | 94 | 92 | 93 | 96 | 122 | 94 | 116 |
-| constrained_wireless | 10 | 118 | 119 | 118 | 129 | 161 | 123 | 165 |
-| constrained_wireless | 50 | 137 | 135 | 165 | 680 | 553 | 368 | 703 |
+| constr_wireless | 1 | 94 | 92 | 93 | 96 | 122 | 94 | 116 |
+| constr_wireless | 10 | 118 | 119 | 118 | 129 | 161 | 123 | 165 |
+| constr_wireless | 50 | 137 | 135 | 165 | 680 | 553 | 368 | 703 |
 
 At c = 1 and c = 10, the three non-adaptive methods track each other closely within each profile, as expected since they issue no extra network calls per request; `fixed_lspm` costs little beyond `raw`/`naive` at these concurrencies. Both adaptive methods sit noticeably above the non-adaptive group even at c = 1 (roughly 20-30 ms higher), the fixed per-request cost of one live HTTP round trip to vLLM's `/metrics` endpoint before the compression ratio can be decided. At c = 50, the gap widens sharply for both adaptive methods relative to `fixed_lspm` (which itself is already elevated over `raw`/`naive` at c = 50, 125 ms vs. 74-78 ms in `edge_lan`, consistent with CPU-bound cross-encoder scoring under load, the same effect documented for the GPU benchmark in Section 5.8): `kv_aware` and `network_aware` both land in the 543-715 ms range after the fix, four to nine times `fixed_lspm`'s TTFT in the same cell.
 
