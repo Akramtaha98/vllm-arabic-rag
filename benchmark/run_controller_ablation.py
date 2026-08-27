@@ -167,9 +167,8 @@ def worker_loop(host, pruner, controller, condition, stop_event, get_concurrency
 def run_condition(host, condition, out_dir):
     pruner = SemanticPruner(model_name=PRUNER_MODEL_NAME)
     controller = DynamicRatioController(
-        metrics_url=f"{host}/metrics",
-        config=DynamicRatioConfig(),
-    ) if hasattr(DynamicRatioController, "__init__") else None
+        config=DynamicRatioConfig(metrics_url=f"{host}/metrics"),
+    )
 
     out_path = out_dir / f"{condition}_ratio_log.jsonl"
     log_file = open(out_path, "w", encoding="utf-8")
