@@ -42,9 +42,9 @@ from middleware.vllm_client import VLLMClient
 ROOT = Path(__file__).resolve().parent.parent
 EVAL_SET = json.load(open(ROOT / "data/arcd_eval_set.json", encoding="utf-8"))
 
-API_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
-MODEL = "meta/llama-3.1-8b-instruct"
-API_KEY = os.environ["VLLM_API_KEY"]
+API_URL = os.environ.get("VLLM_API_URL", "https://integrate.api.nvidia.com/v1/chat/completions")
+MODEL = os.environ.get("VLLM_MODEL_NAME", "meta/llama-3.1-8b-instruct")
+API_KEY = os.environ.get("VLLM_API_KEY")  # optional -- self-hosted vLLM servers need no auth
 
 # Multilingual checkpoint (not the English-only meetingbank-large default)
 # since our context is Arabic; still meeting-summarization-domain-trained,

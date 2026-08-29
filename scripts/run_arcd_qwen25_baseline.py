@@ -43,17 +43,19 @@ from middleware.vllm_client import VLLMClient
 ROOT = Path(__file__).resolve().parent.parent
 EVAL_SET = json.load(open(ROOT / "data/arcd_eval_set.json", encoding="utf-8"))
 
-API_URL = "https://integrate.api.nvidia.com/v1/chat/completions"
+API_URL = os.environ.get("VLLM_API_URL", "https://integrate.api.nvidia.com/v1/chat/completions")
 
 # Model id confirmed against NVIDIA's own NIM API reference page
 # (docs.api.nvidia.com/nim/reference/qwen-qwen2_5-7b-instruct) as of this
 # writing. If this 404s when you run it, check https://build.nvidia.com
 # for the exact current model string and update MODEL below -- do not
-# guess a different id silently.
-MODEL = "qwen/qwen2.5-7b-instruct"
+# guess a different id silently. For a self-hosted vLLM server, set
+# VLLM_MODEL_NAME to whatever --served-model-name you started the server
+# with (or the real HF repo id if you didn't pass --served-model-name).
+MODEL = os.environ.get("VLLM_MODEL_NAME", "qwen/qwen2.5-7b-instruct")
 GENERATOR_LABEL = "qwen2.5-7b-instruct"
 
-API_KEY = os.environ["VLLM_API_KEY"]
+API_KEY = os.environ.get("VLLM_API_KEY")  # optional -- self-hosted vLLM servers need no auth
 
 SYSTEM_PROMPT = (
     "أنت مساعد ذكي تجيب بدقة بالاعتماد فقط على السياق المتاح لك. "
