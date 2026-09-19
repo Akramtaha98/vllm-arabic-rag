@@ -1,0 +1,64 @@
+% response_letter.sty
+% Minimal package implementing the letterhead / reviewer-comment / response
+% macros used by Response_to_Reviewer{1,2,3}.tex for the "Semantic-Driven
+% Context Pruning for Arabic RAG" MDPI Information submission. Modeled on
+% the macro names and visual structure of an existing response-letter
+% template supplied as a formatting reference; this .sty file itself was
+% written from scratch since the original package file was not provided.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{response_letter}[2026/09/19 v1.0 minimal response-letter macros]
+
+\RequirePackage[margin=1in]{geometry}
+\RequirePackage{enumitem}
+\RequirePackage{xcolor}
+\RequirePackage{titlesec}
+\RequirePackage{hyperref}
+\RequirePackage{amsmath}
+\RequirePackage{parskip}
+
+\definecolor{rlblue}{RGB}{0,90,156}
+\definecolor{rlgrey}{RGB}{90,90,90}
+\definecolor{rlbg}{RGB}{240,244,248}
+
+\hypersetup{colorlinks=true, linkcolor=rlblue, urlcolor=rlblue, citecolor=rlblue}
+
+\titleformat{\section}{\large\bfseries\color{rlblue}}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\normalsize\bfseries\color{rlblue}}{\thesubsection}{0.6em}{}
+
+% -----------------------------------------------------------------------
+% \letterheader{Reviewer label}{Paper title}{metadata line}
+% -----------------------------------------------------------------------
+\newcommand{\letterheader}[3]{%
+  \begin{center}
+    {\LARGE\bfseries Response to #1}\\[4pt]
+    {\large\itshape #2}\\[4pt]
+    {\small\color{rlgrey} #3}
+  \end{center}
+  \vspace{10pt}
+  \noindent\rule{\linewidth}{0.6pt}
+  \vspace{8pt}
+}
+
+% -----------------------------------------------------------------------
+% reviewercomment environment: takes one argument (a short label, e.g.
+% "Reviewer comment") printed as a small caption above the shaded block.
+% -----------------------------------------------------------------------
+\newenvironment{reviewercomment}[1]{%
+  \vspace{4pt}\noindent{\small\bfseries\color{rlgrey}#1:}\par
+  \vspace{2pt}\noindent{\color{rlblue}\rule{\linewidth}{0.4pt}}\par
+  \vspace{2pt}
+  \begin{quote}
+  \itshape\color{black!80}
+}{%
+  \end{quote}
+  \vspace{-2pt}
+  \noindent{\color{rlblue}\rule{\linewidth}{0.4pt}}
+  \vspace{4pt}
+}
+
+% -----------------------------------------------------------------------
+% \response : bold "Response:" lead-in, normal (non-italic) text follows.
+% -----------------------------------------------------------------------
+\newcommand{\response}{\noindent\textbf{\color{rlblue}Response:} }
+
+\endinput
