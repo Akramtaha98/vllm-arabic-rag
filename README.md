@@ -1,6 +1,6 @@
 <div align="center">
 
-# LSPM — Semantic-Driven Context Pruning for Arabic RAG
+# LSPM - Semantic-Driven Context Pruning for Arabic RAG
 
 **Quality-preserving context compression for memory-constrained vLLM deployments**
 
